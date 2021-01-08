@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:p="http://www.springframework.org/schema/p" xmlns:c="http://www.springframework.org/schema/c"
+       xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+    <bean id="databaseIdProvider" class="org.apache.ibatis.mapping.VendorDatabaseIdProvider">
+        <property name="properties">
+            <props>
+                <prop key="MySQL">mysql</prop>
+                <prop key="Oracle">oracle</prop>
+                <prop key="SQL Server">sqlserver</prop>
+                <prop key="DB2">db2</prop>
+                <prop key="PostgreSQL">postgres</prop>
+                <prop key="H2">h2</prop>
+            </props>
+        </property>
+    </bean>
+    <!-- Servlet真实路径获取类 -->
+    <bean id="pathResolver" class="com.jspbb.util.web.ServletPathResolver"/>
+    <!-- IP地址查询库 -->
+    <bean id="ipSeeker" class="com.jspbb.util.ip.IpSeeker">
+        <constructor-arg value="classpath:ip2region.db"/>
+    </bean>
+    <!-- 腾讯云对象存储文件Handler -->
+    <bean id="cloudFileHandler" class="com.jspbb.util.file.QcloudFileHandler">
+        <constructor-arg name="accessKey" value="${qcloud.cos.accessKey}"/>
+        <constructor-arg name="secretKey" value="${qcloud.cos.secretKey}"/>
+        <constructor-arg name="region" value="${qcloud.cos.region}"/>
+        <constructor-arg name="bucket" value="${qcloud.cos.bucket}"/>
+        <constructor-arg name="storePrefix" value="${qcloud.cos.storePrefix}"/>
+        <constructor-arg name="displayPrefix" value="${qcloud.cos.displayPrefix}"/>
+    </bean>
+    <!-- 本地文件Handler -->
+    <bean id="fileHandler" class="com.jspbb.util.file.LocalFileHandler">
+        <constructor-arg name="pathResolver" ref="pathResolver"/>
+        <constructor-arg name="storePrefix" value="${localFile.storePrefix}"/>
+        <constructor-arg name="displayPrefix" value="${localFile.displayPrefix}"/>
+    </bean>
+    <!-- Thumbnailator图片处理 -->
+    <bean id="imageHandler" class="com.jspbb.util.image.ThumbnailatorHandler"/>
+    <!-- ImageMagick图片处理 -->
+    <!--<bean id="imageHandler" class="com.jspbb.util.image.ImageMagickHandler">-->
+        <!--&lt;!&ndash; 是否使用GraphicsMagick，默认使用ImageMagick &ndash;&gt;-->
+        <!--<property name="useGM" value="true"/>-->
+        <!--&lt;!&ndash; GraphicsMagick或ImageMagick的安装地址，一般不用设置 &ndash;&gt;-->
+        <!--<property name="searchPath" value=""/>-->
+    <!--</bean>-->
+</beans>

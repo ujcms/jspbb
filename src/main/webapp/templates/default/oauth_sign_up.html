@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>[[#{improveAccountInformation}]] - [[${configs.base.siteName}]]</title>
+    <meta name="keywords" th:content="${configs.base.siteKeywords}">
+    <meta name="description" th:content="${configs.base.siteDescription}">
+    <link th:replace="|${theme}/fragment/common| :: css">
+    <script th:replace="|${theme}/fragment/common| :: js"></script>
+</head>
+<body class="bg-light">
+<div th:replace="|${theme}/fragment/show_error| :: show_error"></div>
+<div th:replace="|${theme}/fragment/common| :: browser_upgrade"></div>
+<div class="container my-3 my-md-4 my-lg-5">
+    <div class="row justify-content-center">
+        <div class="col col-md-6 col-lg-5 col-xl-5 reg-box">
+            <h3 class="reg-logo text-center">
+                <a href="index.html" th:href="@{/}">jsp<b>BB</b></a> <span th:text="#{improveAccountInformation}"></span>
+            </h3>
+            <div class="mt-3 text-center" th:text="#{welcomeUser(${session?.oauthToken?.displayName?:'NULL'})}"></div>
+            <div th:if="${shiroLoginFailure}" class="alert alert-warning alert-dismissible fade show" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <th:block th:switch="${shiroLoginFailure}">
+                    <span th:case="IncorrectCaptchaException" th:text="#{error.captchaIncorrect}"></span>
+                    <span th:case="UnknownAccountException" th:text="#{error.unknownAccount}"></span>
+                    <span th:case="IncorrectCredentialsException" th:text="#{error.incorrectPassword}"></span>
+                    <span th:case="LockedAccountException" th:text="#{error.lockedAccount}"></span>
+                    <span th:case="*" th:text="${shiroLoginFailure}"></span>
+                </th:block>
+            </div>
+            <div class="card mt-3">
+                <div class="card-header">
+                    <ul class="nav nav-tabs card-header-tabs" role="tabList">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#validForm" data-toggle="tab" role="tab" th:text="#{createNewUser}"></a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#bindForm" data-toggle="tab" role="tab" th:text="#{bindExistingUser}"></a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-body pt-4 py-4 tab-content">
+                    <form class="tab-pane show active" id="validForm" th:action="@{/oauth/sign_up}" method="POST">
+                        <div class="form-group">
+                            <label class="sr-only" for="username" th:text="#{user.username}"></label>
+                            <input type="text" class="form-control" id="username" name="username" th:value="${session?.oauthToken?.displayName}" th:placeholder="#{user.username}" required
+                                   th:maxlength="${configs.signUp.usernameMaxLength}" th:data-rule-minlength="${configs.signUp.usernameMinLength}"
+                                   th:data-rule-pattern="${configs.signUp.usernameRegex}" th:data-msg-pattern="#{user.username.pattern}"
+                                   th:data-rule-remote="@{/api/users/username_not_exist}" th:data-msg-remote="#{user.username.exist}">
+                            <!--<small class="form-text text-muted">4~18个字符，可使用字母、数字、下划线</small>-->
+                        </div>
+                        <th:block th:if="${configs.signUp.verifyMode==4}">
+                            <div th:fragment="mobile" class="form-group">
+                                <label class="sr-only" for="mobile" th:text="#{user.mobile}"></label>
+                                <input type="text" class="form-control" id="mobile" name="mobile" th:placeholder="#{user.mobile}" required th:title="#{user.mobile.required}"
+                                       data-rule-pattern="^1\d{10}$" th:data-msg-pattern="#{user.mobile.invalid}" th:data-rule-remote="@{/api/users/mobile_not_exist}" th:data-msg-remote="#{user.mobile.exist}">
+                            </div>
+                            <div th:fragment="mobileMessage" class="form-group">
+                                <label class="sr-only" for="mobileMessage" th:text="#{mobileMessage}"></label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="mobileMessage" name="mobileMessage" th:placeholder="#{mobileMessage}" autocomplete="off" required th:title="#{enterMobileMessage}"
+                                           th:data-msg-remote="#{incorrectMobileMessage}">
+                                    <input type="hidden" id="mobileMessageId" name="mobileMessageId">
+                                    <span class="input-group-append"><button class="btn btn-secondary" id="mobileMessageButton" type="button" th:text="#{obtainMobileMessage}"></button></span>
+                                </div>
+                            </div>
+                        </th:block>
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                        <button type="submit" class="btn btn-primary btn-block" th:text="#{signUp}"></button>
+                        <p class="text-center text-muted mt-3 mb-0">
+                            <small>点击"注册"，代表您同意<a href="terms.html" th:href="@{/terms}" th:text="#{termsOfService}"></a></small>
+                        </p>
+                    </form>
+                    <form class="tab-pane" id="bindForm" th:action="@{/oauth/bind}" method="POST">
+                        <div class="form-group">
+                            <label class="sr-only" for="usernameBind" th:text="#{user.username}"></label>
+                            <input type="text" class="form-control" id="usernameBind" name="username" th:placeholder="#{user.username}" required th:data-rule-remote="@{/api/users/username_exist}"
+                                   th:data-msg-remote="#{user.username.notExist}">
+                            <!--<small class="form-text text-muted">4~18个字符，可使用字母、数字、下划线</small>-->
+                        </div>
+                        <div class="form-group">
+                            <label class="sr-only" for="password" th:text="#{user.password}"></label>
+                            <input type="password" class="form-control" id="password" name="password" th:placeholder="#{user.password}" required autocomplete="off">
+                        </div>
+                        <div class="form-group">
+                            <label class="sr-only" for="captcha" th:text="#{captcha}"></label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="captcha" name="captcha" onfocus="fetchCaptcha()" th:placeholder="#{captcha}" autocomplete="off" required th:title="#{enterCaptcha}"
+                                       th:data-msg-remote="#{incorrectCaptcha}">
+                                <div class="input-group-append">
+                                    <img id="captchaImg" class="input-group-text" style="cursor:pointer;padding:0;" onclick="fetchCaptcha()" th:title="#{clickToRetrieveCaptcha}"
+                                         src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7">
+                                    <input type="hidden" id="captchaToken" name="captchaToken">
+                                    <script th:inline="javascript">
+                                        function fetchCaptcha() {
+                                            request(/*[[@{/api/captcha}]]*/'', {}).then(function (data) {
+                                                if (data === null) return;
+                                                $('#captchaImg').attr('src', 'data:image/png;base64,' + data.base64);
+                                                $('#captchaToken').val(data.token);
+                                            });
+                                        }
+                                    </script>
+                                </div>
+                            </div>
+                        </div>
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                        <button type="submit" class="btn btn-primary btn-block" th:text="#{signUp}"></button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:if="${configs.signUp.verifyMode==2 || configs.signUp.verifyMode==4}" th:replace="|${theme}/fragment/send_sms| :: send_mobile_mmessage"></div>
+<script th:inline="javascript">
+    $(function () {
+        var formValidator = $("#validForm").validate({
+            rules: {
+                mobileMessage: {
+                    remote: {
+                        url: /*[[@{/api/try_mobile_message}]]*/'', data: {
+                            mobileMessageId: function () {
+                                return $('#mobileMessageId').val();
+                            },
+                            mobile: function () {
+                                return $('#mobile').val();
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        $('#mobileMessageButton').click(function () {
+            sendMobileMessage(formValidator, $('#mobile'), $('#mobileMessageId'), $(this), 'signUp');
+        });
+        $("#bindForm").validate({
+            rules: {
+                captcha: {
+                    remote: {
+                        url: /*[[@{/api/try_captcha}]]*/'', data: {
+                            token: function () {
+                                return $('#captchaToken').val();
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        // $("#username").focus().select();
+    });
+</script>
+<script th:replace="|${theme}/fragment/common| :: access_log"></script>
+</body>
+</html>

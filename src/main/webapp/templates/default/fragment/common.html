@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <th:block th:fragment="css">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta name="renderer" content="webkit">
+        <link rel="stylesheet" href="../../../vendor/bootstrap/dist/css/bootstrap.min.css" th:href="@{/vendor/bootstrap/dist/css/bootstrap.min.css}">
+        <link rel="stylesheet" href="../../../vendor/fontawesome-free/css/all.min.css" th:href="@{/vendor/fontawesome-free/css/all.min.css}">
+        <link rel="stylesheet" href="../../../vendor/jquery-confirm/dist/jquery-confirm.min.css" th:href="@{/vendor/jquery-confirm/dist/jquery-confirm.min.css}">
+        <link rel="stylesheet" href="../../../vendor/github-markdown-css/github-markdown.css" th:href="@{/vendor/github-markdown-css/github-markdown.css}">
+        <!--<link rel="stylesheet" href="../../../vendor/selectize.js/dist/css/selectize.css" th:href="@{/vendor/selectize.js/dist/css/selectize.css}">-->
+        <link rel="stylesheet" href="../../../vendor/selectize.js/dist/css/selectize.bootstrap3.css" th:href="@{/vendor/selectize.js/dist/css/selectize.bootstrap3.css}">
+        <link rel="stylesheet" href="../css/main.css" th:href="|@{/templates}/${theme}/css/main.css|">
+    </th:block>
+    <th:block th:fragment="css_simplemde">
+        <link rel="stylesheet" href="../../../js/simplemde/dist/simplemde.min.css" th:href="@{/js/simplemde/dist/simplemde.min.css}">
+        <link rel="stylesheet" href="../css/simplemde.css" th:href="|@{/templates}/${theme}/css/simplemde.css|">
+    </th:block>
+    <th:block th:fragment="js">
+        <!-- 不使用 jquery 的 ajax 和 动态效果，用 jquery.slim.js，使用独立的 axios 或 whatwg-fetch （jquery 的 ajax 功能不能去除，jquery-validation 的远程校验功能依赖 ajax 功能） -->
+        <!-- 使用 lodash, immutability-helper(update) 等库 -->
+        <!--<script src="../../../vendor/jquery/dist/jquery.slim.min.js" th:src="@{/vendor/jquery/dist/jquery.slim.min.js}"></script>-->
+        <script src="../../../vendor/jquery/dist/jquery.min.js" th:src="@{/vendor/jquery/dist/jquery.min.js}"></script>
+        <script src="../../../vendor/popper.js/dist/umd/popper.min.js" th:src="@{/vendor/popper.js/dist/umd/popper.min.js}"></script>
+        <script src="../../../vendor/bootstrap/dist/js/bootstrap.bundle.min.js" th:src="@{/vendor/bootstrap/dist/js/bootstrap.bundle.min.js}"></script>
+        <script src="../../../vendor/js-cookie/dist/js.cookie.min.js" th:src="@{/vendor/js-cookie/dist/js.cookie.min.js}"></script>
+        <script src="../../../vendor/dayjs/dayjs.min.js" th:src="@{/vendor/dayjs/dayjs.min.js}"></script>
+        <!--<script src="../../../vendor/jquery-form/dist/jquery.form.min.js" th:src="@{/vendor/jquery-form/dist/jquery.form.min.js}"></script>-->
+        <script src="../../../vendor/jquery-validation/dist/jquery.validate.min.js" th:src="@{/vendor/jquery-validation/dist/jquery.validate.min.js}"></script>
+        <script src="../../../vendor/jquery-validation/dist/additional-methods.js" th:src="@{/vendor/jquery-validation/dist/additional-methods.js}"></script>
+        <script src="../../../vendor/jquery-validation/dist/localization/messages_zh.js" th:src="@{/vendor/jquery-validation/dist/localization/messages_zh.js}"></script>
+        <script src="../../../vendor/jquery-serializejson/jquery.serializejson.min.js" th:src="@{/vendor/jquery-serializejson/jquery.serializejson.min.js}"></script>
+        <script src="../../../vendor/jquery-confirm/dist/jquery-confirm.min.js" th:src="@{/vendor/jquery-confirm/dist/jquery-confirm.min.js}"></script>
+        <script src="../../../vendor/selectize.js/dist/js/standalone/selectize.min.js" th:src="@{/vendor/selectize.js/dist/js/standalone/selectize.min.js}"></script>
+        <script src="../../../vendor/stomp-websocket/lib/stomp.min.js" th:src="@{/vendor/stomp-websocket/lib/stomp.min.js}"></script>
+        <script src="../../../vendor/sockjs-client/dist/sockjs.min.js" th:src="@{/vendor/sockjs-client/dist/sockjs.min.js}"></script>
+        <!-- es6-promise 和 promise-polyfill 二选一，promise-polyfill 更小，但某些 CDN 里面没有 -->
+        <!--<script src="../../../vendor/es6-promise/dist/es6-promise.auto.min.js" th:src="@{/vendor/es6-promise/dist/es6-promise.auto.min.js}"></script>-->
+        <script src="../../../vendor/promise-polyfill/dist/polyfill.min.js" th:src="@{/vendor/promise-polyfill/dist/polyfill.min.js}"></script>
+        <script src="../../../vendor/whatwg-fetch/dist/fetch.umd.min.js" th:src="@{/vendor/whatwg-fetch/dist/fetch.umd.min.js}"></script>
+        <script src="../../../vendor/qs/dist/qs.min.js" th:src="@{/vendor/qs/dist/qs.min.js}"></script>
+        <!--<script src="../../../vendor/immutable/dist/immutable.min.js" th:src="@{/vendor/immutable/dist/immutable.min.js}"></script>-->
+        <script src="../../../vendor/lodash/lodash.min.js" th:src="@{/vendor/lodash/lodash.min.js}"></script>
+        <!--<script src="../../vendor/circular-json/build/circular-json.js" th:src="@{/vendor/circular-json/build/circular-json.js}"></script>-->
+        <script src="../js/main.js" th:src="|@{/templates}/${theme}/js/main.js|"></script>
+    </th:block>
+    <th:block th:fragment="js_simplemde">
+        <script src="../../../js/simplemde/dist/simplemde.min.js" th:src="@{/js/simplemde/dist/simplemde.min.js}"></script>
+    </th:block>
+    <th:block th:fragment="js_highlight">
+        <link rel="stylesheet" href="../../../js/highlight/default.min.css" th:href="@{/js/highlight/default.min.css}">
+        <script src="../../../js/highlight/highlight.min.js" th:src="@{/js/highlight/highlight.min.js}"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+    </th:block>
+</head>
+<body>
+<th:block th:fragment="browser_upgrade">
+    <!--[if IE]>
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        <span th:utext="#{browserUpgrade}" />
+    </div>
+    <![endif]-->
+</th:block>
+
+<header th:fragment="header" class="bg-light border-bottom">
+    <nav class="container navbar navbar-expand-md navbar-light">
+        <a class="navbar-brand" href="#" th:href="@{/}">jsp<b>BB</b></a>
+        <div class="d-flex align-items-center flex-grow-1">
+            <ul class="navbar-nav mr-auto"></ul>
+            <form class="form-inline mr-3 mr-lg-4 d-none d-sm-block" th:action="@{/search}" method="get">
+                <div class="input-group">
+                    <label><input class="form-control" type="text" name="q" th:value="${param.q}" th:placeholder="#{search}"></label>
+                    <div class="input-group-append">
+                        <button class="btn btn-primary" type="submit"><i class="fa fa-search"></i></button>
+                    </div>
+                </div>
+            </form>
+            <div th:if="${user}" class="mr-3 mr-lg-4">
+                <a th:href="@{/notifications}"><i class="far fa-bell lead"></i><span class="badge badge-danger" id="notificationCount"></span></a>
+            </div>
+            <div th:if="${user}" class="dropdown mr-3 mr-lg-4">
+                <img src="" th:src="@{${user.ext.pictureUrlSmall}}" th:alt="${user.username}" th:title="${user.username}" class="rounded-circle dropdown-toggle" data-toggle="dropdown" style="width:35px;height:35px;cursor:pointer;">
+                <div class="dropdown-menu dropdown-menu-right">
+                    <a class="dropdown-item" th:href="@{${user.homepage}}"><i class="far fa-user"></i> <span th:text="#{myHome}"></span></a>
+                    <a class="dropdown-item" th:href="@{/messages}">
+                        <i class="far fa-envelope"></i> <span th:text="#{messages}"></span>
+                        <span class="badge badge-danger" id="messageUnreadCount"></span>
+                    </a>
+                    <a class="dropdown-item" th:href="@{/settings/profile}"><i class="fas fa-cog"></i> <span th:text="#{settings}"></span></a>
+                    <form th:action="@{/logout}" method="POST">
+                        <button class="dropdown-item" type="submit"><i class="fas fa-sign-out-alt"></i> <span th:text="#{logout}"></span></button>
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                    </form>
+                </div>
+            </div>
+            <div th:unless="${user}" class="mr-2 text-right">
+                <a class="btn btn-light text-primary" th:href="@{/sign_in(fallbackUrl=${url})}" th:text="#{signIn}"></a>
+                <a class="btn btn-primary" th:href="@{/sign_up(fallbackUrl=${url})}" th:text="#{signUp}"></a>
+            </div>
+        </div>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse flex-grow-0" id="navbarSupportedContent">
+            <form class="form-inline my-2 d-block d-sm-none" th:action="@{/search}" method="get">
+                <div class="input-group">
+                    <label><input class="form-control" type="text" name="q" th:value="${param.q}" th:placeholder="#{search}"></label>
+                    <div class="input-group-append">
+                        <button class="btn btn-primary" type="submit"><i class="fa fa-search"></i></button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </nav>
+    <script th:inline="javascript">
+        // 标题显示通知数量
+        var origDocumentTitle = document.title;
+        // 获取未读消息数量
+        $messageUnreadCount = $('#messageUnreadCount');
+        request(/*[[@{/api/messages/unread_count}]]*/'').then(function(data){
+            if(data===null) return;
+            if (data > 0) $messageUnreadCount.text(result);
+        });
+        // 获取未读通知数量
+        $notificationCount = $('#notificationCount');
+        request(/*[[@{/api/notifications/count}]]*/'').then(function(data){
+            if(data===null) return;
+            if (data > 0) {
+                $notificationCount.text(data);
+                document.title = '(' + data + ') ' + origDocumentTitle;
+            }
+        });
+        // 订阅通知
+        var socket = new SockJS(/*[[@{/portfolio}]]*/'');
+        var stompClient = Stomp.over(socket);
+        stompClient.connect({}, function connectCallback(frame) {
+            stompClient.subscribe('/user/queue/notifications', function (response) {
+                var obj = JSON.parse(response.body);
+                var notificationCount = $notificationCount.text();
+                if (notificationCount === '') {
+                    $notificationCount.text('1');
+                    document.title = '(' + 1 + ') ' + origDocumentTitle;
+                } else {
+                    var notificationCountInt = parseInt(notificationCount) + 1;
+                    $notificationCount.text(notificationCountInt);
+                    document.title = '(' + notificationCountInt + ') ' + origDocumentTitle;
+                }
+                if (obj.type === 'message') {
+                    var messageUnreadCount = $messageUnreadCount.text();
+                    if (messageUnreadCount === '') {
+                        $messageUnreadCount.text('1');
+                    } else {
+                        $messageUnreadCount.text(parseInt(messageUnreadCount) + 1);
+                    }
+                }
+                if (isNotificationAllowed()) {
+                    var titles = {'message': /*[[#{notification.type.message}]]*/'', 'comment': /*[[#{notification.type.comment}]]*/'', 'reply': /*[[#{notification.type.reply}]]*/'', 'at': /*[[#{notification.type.at}]]*/''};
+                    var notification = new Notification(titles[obj.type], {body: obj.body, tag: obj.tag});
+                    if (obj.url) {
+                        notification.onclick = function (event) {
+                            // event.preventDefault(); // prevent the browser from focusing the Notification's tab
+                            var contextPath = /*[[${#request.getContextPath()}]]*/'';
+                            location.href = contextPath + obj.url;
+                        };
+                    }
+                }
+            });
+        });
+    </script>
+</header>
+
+<footer th:fragment="footer" class="bg-light text-muted small text-center p-4 mt-3">
+    <div>Powered by <a href="http://www.jspxcms.com/jspbb/">jspBB</a> © <span th:text="${#temporals.year(#temporals.createToday())}"></span> jspBB <a href="http://beian.miit.gov.cn" rel="nofollow" class="text-muted text-nowrap">赣ICP备12001124号-1</a></div>
+    <div class="mt-1" th:text="${#jspbb.processedIn()}"></div>
+    <script>
+        // (function () {
+        //     var bp = document.createElement('script');
+        //     var curProtocol = window.location.protocol.split(':')[0];
+        //     if (curProtocol === 'https') {
+        //         bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        //     }
+        //     else {
+        //         bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        //     }
+        //     var s = document.getElementsByTagName("script")[0];
+        //     s.parentNode.insertBefore(bp, s);
+        // })();
+    </script>
+</footer>
+
+<th:block th:fragment="access_log">
+    <script>document.write(decodeURI('%3Cscript src="[[@{/access}]]?url=') + encodeURIComponent(document.location.href) + decodeURI('&referrer=') + encodeURIComponent(document.referrer) + decodeURI('"%3E%3C/script%3E'));</script>
+</th:block>
+
+</body>
+</html>

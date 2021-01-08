@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+<th:block th:fragment="show_error">
+    <div class="modal fade" id="showErrorModel" tabindex="-1" style="z-index:2000;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <div class="modal-body"></div>
+            </div>
+        </div>
+    </div>
+    <script>
+        function request(url, init) {
+            // credentials 用于指定包含 cookie 信息
+            var options = _.assign({credentials: 'include'}, init);
+            var method = options.method && options.method.toUpperCase();
+            if (method === 'POST' || method === 'PUT' || method === 'DELETE') {
+                options.headers = _.assign({
+                    'X-XSRF-TOKEN': Cookies.get("XSRF-TOKEN"),
+                    'Accept': 'application/json'
+                }, options.headers);
+                if (options.body instanceof FormData) {
+                    // 使用 FormData 上传图片不可加 Content-Type，即使加上 multipart/form-data 也是出错。
+                    // options.headers = _.assign({'Content-Type': 'application/x-www-form-urlencoded'}, options.headers);
+                } else {
+                    options.headers = _.assign({'Content-Type': 'application/json;charset=utf-8'}, options.headers);
+                    options.body = JSON.stringify(options.body);
+                }
+            }
+            return fetch(url, options).then(function (response) {
+                if (response.status >= 200 && response.status < 300) return response;
+                var error = new Error(response.statusText);
+                error.status = response.status;
+                error.response = response;
+                throw error;
+            }).then(function (response) {
+                // DELETE and 204 do not return data by default. using .json will report an error.
+                if (options.method === 'DELETE' || response.status === 204) return response.text();
+                return response.json();
+            }).catch(function (error) {
+                if (error.response) {
+                    error.response.json().then(function (data) {
+                        if (data.message && !data.error) {
+                            showError(data.message);
+                        } else {
+                            showErrorPreJson(data);
+                        }
+                    });
+                } else {
+                    showErrorPre(error);
+                }
+                return null;
+            });
+        }
+
+        function showError(text) {
+            $('#showErrorModel .modal-dialog').removeClass('modal-xl').css('max-width', '');
+
+            $('#showErrorModel .modal-body').text(text);
+            $('#showErrorModel').modal('show');
+        }
+
+        function showErrorPreJson(json) {
+            $('#showErrorModel .modal-dialog').addClass('modal-xl').css('max-width', '100%');
+
+            var modalBody = $('#showErrorModel .modal-body').empty();
+            makeModalBody(modalBody, json);
+            // 不知 bootstrap 为何会自动加上 padding-right:17px，去除该项值。
+            $('#showErrorModel').modal('show').css('padding-right','');
+        }
+
+        // data 为 XMLHttpRequest 对象：https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest
+        function showErrorPre(data) {
+            $('#showErrorModel .modal-dialog').addClass('modal-xl').css('max-width', '100%');
+
+            var modalBody = $('#showErrorModel .modal-body').empty();
+            // 能否使用 response.json() 方法？不行，只有 fetch 的 response 才可以。responseText 是 XMLHttpRequest 的标准属性。
+            var json = data.responseJSON || (data.responseText && JSON.parse(data.responseText));
+            if (json) {
+                makeModalBody(modalBody, json);
+            } else {
+                modalBody.append($('<pre>').text(JSON.stringify(data, null, 4)));
+            }
+            // 不知 bootstrap 为何会自动加上 padding-right:17px，去除该项值。
+            $('#showErrorModel').modal('show').css('padding-right','');
+        }
+
+        function makeModalBody(modalBody, json) {
+            modalBody.append($('<h1>').append($('<span>').text(json.status)).append($('<small>').text(' (' + json.error + ')')))
+                .append($('<p>').text('path: ' + json.path))
+                .append($('<p>').text('timestamp: ' + dayjs(json.timestamp).format('YYYY-MM-DDTHH:mm:ss.SSSZZ')))
+                .append($('<p>').append($('<code>').text(json.message)));
+            if (json.trace) modalBody.append($('<pre>').css({'white-space': 'pre-wrap', 'word-wrap': 'break-word'}).append($('<code>').text(json.trace)));
+        }
+    </script>
+
+    <!--<div id="showSuccess" class="alert alert-success position-fixed" style="top:6px;right:6px;display:none;" role="alert"><i class="far fa-check-circle"></i> <span id="successText"></span></div>-->
+
+    <div id="successToast" class="toast bg-success text-white" role="alert" aria-live="assertive" aria-atomic="true" data-delay="3000" style="position: absolute; top: 4px; right: 4px;">
+        <div class="toast-body"><i class="far fa-check-circle"></i><span class="ml-2" id="successMessage"></span></div>
+    </div>
+
+    <script th:inline="javascript">
+        // 检查是否需要显示“操作成功”
+        (function () {
+            var success = Cookies.get('success_');
+            if (success) {
+                // 显示后清空“操作成功”标识
+                Cookies.remove('success_', {path: '/'});
+                $('#successMessage').text(success);
+                $('#successToast').toast('show');
+                // $("#successToast").fadeIn("slow");
+                // setTimeout(function () {
+                //     $("#successToast").fadeOut("slow");
+                // }, 3000);
+            }
+        })();
+
+        // 设置“操作成功”标识
+        function showSuccess(text) {
+            if (!text) text = /*[[#{success}]]*/'success';
+            Cookies.set('success_', text, {path: '/'});
+        }
+    </script>
+</th:block>
+</body>
+</html>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jspbb.core.mapper.ConfigMapper">
+    <resultMap id="BaseResultMap" type="com.jspbb.core.domain.Config">
+        <id column="name_" jdbcType="VARCHAR" property="name"/>
+        <result column="value_" jdbcType="CLOB" property="value"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        name_, value_
+    </sql>
+    <select id="select" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM jspbb_config
+        WHERE name_ = #{name,jdbcType=VARCHAR}
+    </select>
+    <delete id="delete">
+        DELETE FROM jspbb_config
+        WHERE name_ = #{name,jdbcType=VARCHAR}
+    </delete>
+    <insert id="insert" parameterType="com.jspbb.core.domain.Config">
+        INSERT INTO jspbb_config (<include refid="Base_Column_List"/>)
+        VALUES (#{name,jdbcType=VARCHAR}, #{value,jdbcType=CLOB})
+    </insert>
+    <update id="update" parameterType="com.jspbb.core.domain.Config">
+        UPDATE jspbb_config
+        SET value_ = #{value,jdbcType=CLOB}
+        WHERE name_ = #{name,jdbcType=VARCHAR}
+    </update>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        from jspbb_config
+    </select>
+    <delete id="deleteByNamePrefix">
+        DELETE FROM jspbb_config
+        WHERE name_ LIKE #{name,jdbcType=VARCHAR}
+    </delete>
+</mapper>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>[[#{notifications}]] - [[${configs.base.siteName}]]</title>
+    <meta name="keywords" th:content="${configs.base.siteKeywords}">
+    <meta name="description" th:content="${configs.base.siteDescription}">
+    <link th:replace="|${theme}/fragment/common| :: css">
+    <link th:replace="|${theme}/fragment/common| :: css_simplemde">
+    <script th:replace="|${theme}/fragment/common| :: js"></script>
+</head>
+<body>
+<div th:replace="|${theme}/fragment/show_error| :: show_error"></div>
+<div th:replace="|${theme}/fragment/common| :: browser_upgrade"></div>
+<header th:replace="|${theme}/fragment/common| :: header"></header>
+<div class="container mt-2">
+    <div class="row">
+        <div class="col-sm-9">
+            <div class="clearfix py-2 border-bottom">
+                <h3 class="float-left" th:text="#{notifications}"></h3>
+            </div>
+            <div th:jspbb-notifications="beans" th:with="userId=${user.id},pageSize=15, pageable=true">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item px-0" th:each="bean:${beans}" th:object="${bean}" th:with="notificationType='notification.type.'+${bean.type}">
+                        <span th:text="#{${notificationType}}"></span> <span th:text="${bean.body}"></span>
+                    </li>
+                </ul>
+                <nav class="mt-2" th:if="${beans.pages gt 1}" th:insert="|${theme}/fragment/pagination| :: pagination(${beans})"></nav>
+                <script th:replace="|${theme}/fragment/pagination| :: adjust_page"></script>
+                <div class="mt-2" th:if="${#lists.isEmpty(beans)}" th:insert="|${theme}/fragment/pagination| :: no_data"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<footer th:replace="|${theme}/fragment/common| :: footer"></footer>
+<script th:replace="|${theme}/fragment/common| :: js_simplemde"></script>
+<script th:replace="|${theme}/fragment/common| :: access_log"></script>
+</body>
+</html>

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE generatorConfiguration PUBLIC
+        "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd" >
+<generatorConfiguration>
+
+    <!-- !!!! Driver Class Path !!!! -->
+    <classPathEntry location="D:\repositories\maven\mysql\mysql-connector-java\5.1.44\mysql-connector-java-5.1.44.jar"/>
+
+    <context id="context" targetRuntime="MyBatis3">
+        <commentGenerator>
+            <property name="suppressAllComments" value="true"/>
+            <property name="suppressDate" value="true"/>
+        </commentGenerator>
+
+        <!-- !!!! Database Configurations !!!! -->
+        <jdbcConnection driverClass="${jdbc.driverClassName}" connectionURL="${jdbc.url}" userId="${jdbc.username}" password="${jdbc.password}"/>
+
+        <javaTypeResolver>
+            <property name="forceBigDecimals" value="false"/>
+        </javaTypeResolver>
+
+        <!-- !!!! Model Configurations !!!! -->
+        <javaModelGenerator targetPackage="com.jspbb.core.domain" targetProject="src/main/java">
+            <property name="enableSubPackages" value="false"/>
+            <!--<property name="trimStrings" value="true"/>-->
+        </javaModelGenerator>
+
+        <!-- !!!! Mapper XML Configurations !!!! -->
+        <sqlMapGenerator targetPackage="com.jspbb.core.mapper" targetProject="src/main/resources">
+            <property name="enableSubPackages" value="false"/>
+        </sqlMapGenerator>
+
+        <!-- !!!! Mapper Interface Configurations !!!! -->
+        <javaClientGenerator targetPackage="com.jspbb.core.mapper" targetProject="src/main/java" type="XMLMAPPER">
+            <property name="enableSubPackages" value="false"/>
+        </javaClientGenerator>
+
+        <!-- !!!! Table Configurations !!!! -->
+        <!-- 保留 tableName="null" 的配置，避免没有 table 配置导致报错 -->
+        <table tableName="null" domainObjectName="null"/>
+        <!--<table tableName="jspbb_seq" domainObjectName="Seq" enableCountByExample="false" enableDeleteByExample="false" enableSelectByExample="false" enableUpdateByExample="false"/>-->
+        <!--<table tableName="jspbb_config" domainObjectName="Config" enableCountByExample="false" enableDeleteByExample="false" enableSelectByExample="false" enableUpdateByExample="false"/>-->
+        <!--<table tableName="jspbb_user" domainObjectName="User" enableCountByExample="false" enableDeleteByExample="false" enableSelectByExample="false" enableUpdateByExample="false">-->
+            <!--<columnOverride column="user_id_" property="id"/>-->
+        <!--</table>-->
+        <!--<table tableName="jspbb_user_ext" domainObjectName="UserExt" enableCountByExample="false" enableDeleteByExample="false" enableSelectByExample="false" enableUpdateByExample="false">-->
+            <!--<columnOverride column="user_id_" property="id"/>-->
+        <!--</table>-->
+        <!--<table tableName="jspbb_user_openid" domainObjectName="UserOpenid" enableCountByExample="false" enableDeleteByExample="false" enableSelectByExample="false" enableUpdateByExample="false"/>-->
+        <!--<table tableName="jspbb_user_restrict" domainObjectName="UserRestrict" enableCountByExample="false" enableDeleteByExample="false" enableSelectByExample="false" enableUpdateByExample="false"/>-->
+        <!--<table tableName="jspbb_ip_restrict" domainObjectName="IpRestrict" enableCountByExample="false" enableDeleteByExample="false" enableSelectByExample="false" enableUpdateByExample="false"/>-->
+        <!--<table tableName="jspbb_sms" domainObjectName="Sms" enableCountByExample="false" enableDeleteByExample="false" enableSelectByExample="false" enableUpdateByExample="false">-->
+            <!--<columnOverride column="sms_id_" property="id"/>-->
+        <!--</table>-->
+        <!--<table tableName="jspbb_question" domainObjectName="Question" enableCountByExample="false" enableDeleteByExample="false" enableSelectByExample="false" enableUpdateByExample="false">-->
+            <!--<columnOverride column="question_id_" property="id"/>-->
+        <!--</table>-->
+        <!--<table tableName="jspbb_question_ext" domainObjectName="QuestionExt" enableCountByExample="false" enableDeleteByExample="false" enableSelectByExample="false" enableUpdateByExample="false">-->
+            <!--<columnOverride column="question_id_" property="id"/>-->
+        <!--</table>-->
+        <!--<table tableName="jspbb_answer" domainObjectName="Answer" enableCountByExample="false" enableDeleteByExample="false" enableSelectByExample="false" enableUpdateByExample="false">-->
+            <!--<columnOverride column="answer_id_" property="id"/>-->
+        <!--</table>-->
+        <!--<table tableName="jspbb_answer_ext" domainObjectName="AnswerExt" enableCountByExample="false" enableDeleteByExample="false" enableSelectByExample="false" enableUpdateByExample="false">-->
+            <!--<columnOverride column="answer_id_" property="id"/>-->
+        <!--</table>-->
+        <!--<table tableName="jspbb_access" domainObjectName="Access" enableCountByExample="false" enableDeleteByExample="false" enableSelectByExample="false" enableUpdateByExample="false">-->
+            <!--<columnOverride column="access_id_" property="id"/>-->
+        <!--</table>-->
+        <!--<table tableName="jspbb_access_ext" domainObjectName="AccessExt" enableCountByExample="false" enableDeleteByExample="false" enableSelectByExample="false" enableUpdateByExample="false">-->
+            <!--<columnOverride column="access_id_" property="id"/>-->
+        <!--</table>-->
+        <!--<table tableName="jspbb_attach" domainObjectName="Attach" enableCountByExample="false" enableDeleteByExample="false" enableSelectByExample="false" enableUpdateByExample="false">-->
+            <!--<columnOverride column="attach_id_" property="id"/>-->
+        <!--</table>-->
+        <!--<table tableName="jspbb_attach_ref" domainObjectName="AttachRef" enableCountByExample="false" enableDeleteByExample="false" enableSelectByExample="false" enableUpdateByExample="false">-->
+            <!--<columnOverride column="attachref_id_" property="id"/>-->
+        <!--</table>-->
+        <!--<table tableName="jspbb_comment" domainObjectName="Comment" enableCountByExample="false" enableDeleteByExample="false" enableSelectByExample="false" enableUpdateByExample="false">-->
+        <!--<columnOverride column="comment_id_" property="id"/>-->
+        <!--</table>-->
+        <!--<table tableName="jspbb_message" domainObjectName="Message" enableCountByExample="false" enableDeleteByExample="false" enableSelectByExample="false" enableUpdateByExample="false">-->
+            <!--<columnOverride column="message_id_" property="id"/>-->
+        <!--</table>-->
+        <!--<table tableName="jspbb_message_detail" domainObjectName="MessageDetail" enableCountByExample="false" enableDeleteByExample="false" enableSelectByExample="false" enableUpdateByExample="false">-->
+            <!--<columnOverride column="messagedetail_id_" property="id"/>-->
+        <!--</table>-->
+        <!--<table tableName="jspbb_notification" domainObjectName="Notification" enableCountByExample="false" enableDeleteByExample="false" enableSelectByExample="false" enableUpdateByExample="false">-->
+        <!--<columnOverride column="notification_id_" property="id"/>-->
+        <!--</table>-->
+        <!--<table tableName="jspbb_role" domainObjectName="Role" enableCountByExample="false" enableDeleteByExample="false" enableSelectByExample="false" enableUpdateByExample="false">-->
+        <!--<columnOverride column="role_id_" property="id"/>-->
+        <!--</table>-->
+        <!--<table tableName="jspbb_user_role" domainObjectName="UserRole" enableCountByExample="false" enableDeleteByExample="false" enableSelectByExample="false" enableUpdateByExample="false"/>-->
+        <table tableName="jspbb_group" domainObjectName="Group" enableCountByExample="false" enableDeleteByExample="false" enableSelectByExample="false" enableUpdateByExample="false"/>
+    </context>
+</generatorConfiguration>

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>[[${targetUser.username}]] - [[${configs.base.siteName}]]</title>
+    <meta name="keywords" th:content="${configs.base.siteKeywords}">
+    <meta name="description" th:content="${configs.base.siteDescription}">
+    <link th:replace="|${theme}/fragment/common| :: css">
+    <link th:replace="|${theme}/fragment/common| :: css_simplemde">
+    <script th:replace="|${theme}/fragment/common| :: js"></script>
+    <script th:replace="|${theme}/fragment/common| :: js_simplemde"></script>
+</head>
+<body>
+<div th:replace="|${theme}/fragment/show_error| :: show_error"></div>
+<div th:replace="|${theme}/fragment/common| :: browser_upgrade"></div>
+<header th:replace="|${theme}/fragment/common| :: header"></header>
+<div class="container mt-2">
+    [[${targetUser.username}]] 主页
+</div>
+
+<footer th:replace="|${theme}/fragment/common| :: footer"></footer>
+<script th:inline="javascript">
+</script>
+<script th:replace="|${theme}/fragment/common| :: access_log"></script>
+</body>
+</html>

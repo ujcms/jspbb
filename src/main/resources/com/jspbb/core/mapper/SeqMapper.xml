@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jspbb.core.mapper.SeqMapper">
+    <resultMap id="BaseResultMap" type="com.jspbb.core.domain.Seq">
+        <id column="name_" jdbcType="VARCHAR" property="name"/>
+        <result column="next_val_" jdbcType="BIGINT" property="nextVal"/>
+        <result column="cache_size_" jdbcType="INTEGER" property="cacheSize"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        name_, next_val_, cache_size_
+    </sql>
+    <select id="select" parameterType="java.lang.String" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM jspbb_seq
+        WHERE = #{name,jdbcType=VARCHAR}
+    </select>
+    <delete id="delete" parameterType="java.lang.String">
+        DELETE FROM jspbb_seq
+        WHERE name_ = #{name,jdbcType=VARCHAR}
+    </delete>
+    <insert id="insert" parameterType="com.jspbb.core.domain.Seq">
+        INSERT INTO jspbb_seq (name_, next_val_, cache_size_)
+        VALUES (#{name,jdbcType=VARCHAR}, #{nextVal,jdbcType=BIGINT}, #{cacheSize, jdbcType=INTEGER})
+    </insert>
+    <update id="update" parameterType="com.jspbb.core.domain.Seq">
+        UPDATE jspbb_seq
+        SET next_val_   = #{nextVal,jdbcType=BIGINT},
+            cache_size_ = #{cacheSize,jdbcType=INTEGER}
+        WHERE name_ = #{name,jdbcType=VARCHAR}
+    </update>
+
+    <select id="selectForUpdate" parameterType="java.lang.String" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM jspbb_seq
+        WHERE name_ = #{name,jdbcType=VARCHAR}
+        FOR UPDATE
+    </select>
+
+    <!-- 通用的列表和分页查询。必须放在一个已经映射Mapper文件里。 -->
+    <sql id="Select_All">
+        SELECT <if test="parser!=null and parser.distinct">DISTINCT</if> t_.*
+        FROM ${tableName} t_
+        <if test="parser != null">
+            <foreach item="table" collection="parser.joinTables">
+                JOIN ${table.tableName} ${table.tableAlias} ON ${table.leftId} = ${table.rightId}
+            </foreach>
+        </if>
+        <where>
+            <if test="parser != null">
+                <foreach item="condition" collection="parser.whereConditions">
+                    AND ${condition.column} ${condition.operator}
+                    <choose>
+                        <when test="condition.operator == 'IN' or condition.operator == 'NOT IN'">
+                            <foreach item="item" index="index" collection="condition.value" open="(" separator="," close=")">
+                                #{item}
+                            </foreach>
+                        </when>
+                        <when test="condition.operator != 'IS NULL'">#{condition.value}</when>
+                    </choose>
+                </foreach>
+                <bind name="whereOrConditions" value="parser.whereOrConditions"/>
+                <foreach item="key" collection="whereOrConditions.keys">
+                    <bind name="orConditions" value="whereOrConditions[key]"/>
+                    <foreach item="condition" collection="orConditions" open="AND (" separator="OR" close=")">
+                        ${condition.column} ${condition.operator}
+                        <choose>
+                            <when test="condition.operator == 'IN' or condition.operator == 'NOT IN'">
+                                <foreach item="item" index="index" collection="condition.value" open="(" separator="," close=")">
+                                    #{item}
+                                </foreach>
+                            </when>
+                            <when test="condition.operator != 'IS NULL'">#{condition.value}</when>
+                        </choose>
+                    </foreach>
+                </foreach>
+            </if>
+        </where>
+        <if test="parser!=null and parser.orderBy!=null">
+            ORDER BY ${parser.orderBy}
+        </if>
+    </sql>
+</mapper>

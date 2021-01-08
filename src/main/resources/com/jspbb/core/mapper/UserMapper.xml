@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jspbb.core.mapper.UserMapper">
+    <resultMap id="BaseResultMap" type="com.jspbb.core.domain.User">
+        <id column="id_" jdbcType="BIGINT" property="id"/>
+        <result column="group_id_" jdbcType="BIGINT" property="groupId"/>
+        <result column="username_" jdbcType="VARCHAR" property="username"/>
+        <result column="email_" jdbcType="VARCHAR" property="email"/>
+        <result column="mobile_" jdbcType="VARCHAR" property="mobile"/>
+        <result column="home_" jdbcType="VARCHAR" property="home"/>
+        <result column="created_" jdbcType="TIMESTAMP" property="created"/>
+        <result column="status_" jdbcType="INTEGER" property="status"/>
+        <association property="ext" javaType="com.jspbb.core.domain.UserExt" column="id_" select="com.jspbb.core.mapper.UserExtMapper.select"/>
+        <association property="group" javaType="com.jspbb.core.domain.Group" column="group_id_" select="com.jspbb.core.mapper.GroupMapper.select"/>
+        <collection property="openidList" javaType="ArrayList" column="id_" select="com.jspbb.core.mapper.UserOpenidMapper.selectByUserId"/>
+        <collection property="restrictList" javaType="ArrayList" column="id_" select="com.jspbb.core.mapper.UserRestrictMapper.selectByUserId"/>
+        <collection property="roleList" javaType="ArrayList" column="id_" select="com.jspbb.core.mapper.RoleMapper.selectByUserId"/>
+        <collection property="configList" javaType="ArrayList" column="id_" select="com.jspbb.core.mapper.ConfigMapper.selectAll"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id_, group_id_, username_, email_, mobile_, home_, created_, status_
+    </sql>
+    <select id="select" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM jspbb_user
+        WHERE id_ = #{id,jdbcType=BIGINT}
+    </select>
+    <delete id="delete" parameterType="java.lang.Long">
+        DELETE FROM jspbb_user
+        WHERE id_ = #{id,jdbcType=BIGINT}
+    </delete>
+    <insert id="insert" parameterType="com.jspbb.core.domain.User">
+        INSERT INTO jspbb_user (<include refid="Base_Column_List"/>)
+        VALUES (#{id,jdbcType=BIGINT}, #{groupId,jdbcType=BIGINT}, #{username,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR},
+        #{mobile,jdbcType=VARCHAR}, #{home,jdbcType=VARCHAR}, #{created,jdbcType=TIMESTAMP}, #{status,jdbcType=INTEGER})
+    </insert>
+    <update id="update" parameterType="com.jspbb.core.domain.User">
+        UPDATE jspbb_user
+        SET group_id_ = #{groupId,jdbcType=BIGINT},
+            username_ = #{username,jdbcType=VARCHAR},
+            email_    = #{email,jdbcType=VARCHAR},
+            mobile_   = #{mobile,jdbcType=VARCHAR},
+            home_     = #{home,jdbcType=VARCHAR},
+            created_  = #{created,jdbcType=TIMESTAMP},
+            status_   = #{status,jdbcType=INTEGER}
+        WHERE id_ = #{id,jdbcType=BIGINT}
+    </update>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        <include refid="com.jspbb.core.mapper.SeqMapper.Select_All">
+            <property name="tableName" value="jspbb_user"/>
+        </include>
+    </select>
+
+    <!-- 消息接收者不能为自身以及系统的匿名用户(ID=0) -->
+    <select id="messageReceiverSuggest" resultMap="BaseResultMap">
+        <bind name="usernamePattern" value="'%' + username + '%'"/>
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM jspbb_user
+        WHERE username_ LIKE #{usernamePattern} AND id_ NOT IN (#{senderId},0)
+    </select>
+    <select id="selectByUsername" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM jspbb_user
+        WHERE username_ = #{username}
+    </select>
+    <select id="selectByMobile" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM jspbb_user
+        WHERE mobile_ = #{mobile}
+    </select>
+    <select id="selectByEmail" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM jspbb_user
+        WHERE email_ = #{email}
+    </select>
+    <select id="selectByHome" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM jspbb_user
+        WHERE home_ = #{home}
+    </select>
+    <select id="selectByOpenid" resultMap="BaseResultMap">
+        SELECT u.*
+        FROM jspbb_user u
+            JOIN jspbb_user_openid uo ON u.id_ = uo.user_id_
+        WHERE uo.provider_ = #{provider} and uo.openid_ = #{openid}
+    </select>
+    <select id="selectByUnionid" resultMap="BaseResultMap">
+        SELECT u.*
+        FROM jspbb_user u
+            JOIN jspbb_user_openid uo ON u.id_ = uo.user_id_
+        WHERE uo.provider_ LIKE #{providerPrefix} and uo.unionid_ = #{unionid}
+    </select>
+</mapper>

@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>[[${question.ext.title}]] - [[${configs.base.siteName}]]</title>
+    <meta name="keywords" th:content="${configs.base.siteKeywords}">
+    <meta name="description" th:content="${configs.base.siteDescription}">
+    <link th:replace="|${theme}/fragment/common| :: css">
+    <link th:replace="|${theme}/fragment/common| :: css_simplemde">
+    <script th:replace="|${theme}/fragment/common| :: js"></script>
+    <script th:replace="|${theme}/fragment/common| :: js_simplemde"></script>
+    <script th:replace="|${theme}/fragment/common| :: js_highlight"></script>
+    <!-- 查看大图插件 -->
+    <link th:replace="|${theme}/fragment/photoswipe| :: css">
+    <script th:replace="|${theme}/fragment/photoswipe| :: js"></script>
+    <style>
+        .CodeMirror, .CodeMirror-scroll {
+            min-height: 200px;
+        }
+    </style>
+</head>
+<body>
+<div th:replace="|${theme}/fragment/show_error| :: show_error"></div>
+<div th:replace="|${theme}/fragment/common| :: browser_upgrade"></div>
+<header th:replace="|${theme}/fragment/common| :: header"></header>
+<div th:fragment="question" class="container my-2">
+    <h1 class="h3"><a th:href="@{/questions/{id}(id=${question.id})}" th:text="${question.ext.title}" class="text-dark h">问题标题</a></h1>
+    <div class="pb-2 text-muted">
+        <a href="javascript:" th:text="${question.user.username}"></a>
+        <span class="ml-2" th:text="${#jspbb.prettyTime(question.created)}"></span>
+        <span class="ml-2" th:text="${question.views}"></span><span th:text="#{views}"></span>
+    </div>
+    <div class="pt-2 border-top markdown-body" th:if="${question.ext.text}" th:utext="${question.ext.text}">问题正文</div>
+    <div class="my-2 small text-muted">
+        <a class="text-muted" href="javascript:" onclick="$('#questionCommentDiv').toggle();" th:text="#{comments}">评论</a>
+        <a class="text-muted ml-1" th:href="@{/questions/{id}/edit(id=${question.id})}" th:if="${user?.hasPerm('questionEdit',question.userId)}" th:text="#{edit}">编辑</a>
+        <a class="text-muted ml-1" th:data-id="${question.id}" onclick="deleteQuestion(this)" href="javascript:" th:if="${user?.hasPerm('questionDelete')}" th:text="#{delete}">删除</a>
+        <span class="ml-2" th:if="${question.editDate}"><span th:text="${#jspbb.prettyTime(question.editDate)}"></span> <span th:text="#{edited}"></span> by <a href="javascript:" th:text="${question.editUser.username}"></a></span>
+    </div>
+    <div class="ml-4" id="questionCommentDiv" th:jspbb-comments="comments" th:with="refType='question', refId=${question.id}, Q_OrderBy='id'" th:classappend="${comments.size() le 0}?'hidden'">
+        <ul class="list-group list-group-flush small">
+            <li class="list-group-item bg-light px-2" th:each="comment:${comments}">
+                <div class="markdown-body" th:utext="${comment.html}">评论内容</div>
+                <div class="text-muted">
+                    <span th:text="${#jspbb.prettyTime(comment.created)}"></span> by <a href="javascript:" th:text="${comment.user.username}"></a>
+                    <a class="text-muted ml-1" th:data-id="${comment.id}" th:data-markdown="${comment.markdown}" onclick="editComment(this)" href="javascript:" th:if="${user?.hasPerm('commentEdit',comment.userId)}" th:text="#{edit}">编辑</a>
+                    <a class="text-muted ml-1" th:data-id="${comment.id}" onclick="deleteComment(this)" href="javascript:" th:if="${user?.hasPerm('commentDelete',comment.userId)}" th:text="#{delete}">删除</a>
+                </div>
+            </li>
+        </ul>
+        <div><a class="small text-black-50" href="javascript:" onclick="$('#questionComment').toggle()" th:text="#{addComment}">我要评论</a></div>
+        <div id="questionComment" class="mt-1" th:classappend="${comments.size() gt 0}?'hidden'">
+            <th:block th:if="${user}">
+                <form id="questionCommentForm" th:action="@{/api/comments/question}" method="POST">
+                    <div class="form-group mb-2">
+                        <textarea class="form-control" name="markdown" rows="2" required autocomplete="off" th:placeholder="#{comment.markdown.placeholder}"
+                                  onkeydown="if(event.ctrlKey && event.key==='Enter'){$(this.form).submit();return false;}" aria-label="markdown"></textarea>
+                    </div>
+                    <input type="hidden" name="refId" th:value="${question.id}"/>
+                    <button class="btn btn-outline-secondary btn-sm" type="submit" th:text="#{submit}">提交</button>
+                </form>
+                <script th:inline="javascript">
+                    $(function () {
+                        $('#questionCommentForm').validate({
+                            submitHandler: function (form) {
+                                request(form.action, {method: form.method, body: $(form).serializeJSON()}).then(function (data) {
+                                    if (data === null) return;
+                                    showSuccess();
+                                    location.reload();
+                                });
+                            }
+                        });
+                    });
+                </script>
+            </th:block>
+            <div th:unless="${user}" class="alert alert-warning" th:text="#{error.login.answer}"></div>
+        </div>
+    </div>
+</div>
+<th:block th:jspbb-answers="beans" th:with="questionId=${question.id},Q_OrderBy='id', pageSize=10, pageable=true">
+    <div class="container mt-3" th:if="${beans.total>0}">
+        <div>
+            <a class="h4" id="answers"><span th:text="${beans.total}"></span> <span th:text="#{answers}">回答</span></a>
+            <a class="ml-2" th:if="${answer}" th:href="@{/questions/{id}(id=${question.id})}" th:text="#{allAnswers}"></a>
+        </div>
+        <ul class="mt-2 list-group list-group-flush">
+            <th:block th:unless="${answer}" th:each="bean:${beans}">
+                <li th:replace=":: answer(${bean})"></li>
+            </th:block>
+            <th:block th:if="${answer}">
+                <li th:fragment="answer(answer)" class="list-group-item px-0 py-3">
+                    <div>
+                        <a href="javascript:" th:text="${answer.user.username}"></a>
+                        <a class="text-muted ml-2" th:href="@{/questions/{id}/answers/{answerId}(id=${question.id},answerId=${answer.id})}" th:text="${#jspbb.prettyTime(answer.created)}"></a>
+                    </div>
+                    <div class="mt-2 markdown-body" th:utext="${answer.ext.text}">回答正文</div>
+                    <div class="mt-2 small text-muted">
+                        <a class="text-muted" href="javascript:" th:onclick="|$('#answerCommentDiv${answer.id}').toggle();|" th:text="#{comments}">评论</a>
+                        <a class="text-muted ml-1" th:href="@{/answers/edit(id=${answer.id})}" th:if="${user?.hasPerm('answerEdit',answer.userId)}" th:text="#{edit}">编辑</a>
+                        <a class="text-muted ml-1" th:data-id="${answer.id}" onclick="deleteAnswer(this);" href="javascript:" th:if="${user?.hasPerm('answerDelete')}" th:text="#{delete}">删除</a>
+                        <span class="ml-2" th:if="${answer.editDate}"><span th:text="${#jspbb.prettyTime(answer.editDate)}"></span> <span th:text="#{edit}"></span> by <a href="javascript:" th:text="${answer.editUser.username}"></a></span>
+                    </div>
+                    <div class="ml-4 mt-2" th:id="|answerCommentDiv${answer.id}|" th:jspbb-comments="comments" th:with="refType='answer', refId=${answer.id},Q_OrderBy='id'" th:classappend="${comments.size() le 0}?'hidden'">
+                        <ul class="list-group list-group-flush small">
+                            <li class="list-group-item bg-light px-2" th:each="comment:${comments}">
+                                <div class="markdown-body" th:utext="${comment.html}">评论内容</div>
+                                <div class="text-muted">
+                                    <span th:text="${#jspbb.prettyTime(comment.created)}"></span> by <a href="javascript:" th:text="${comment.user.username}"></a>
+                                    <a class="text-muted ml-1" th:data-id="${comment.id}" onclick="deleteComment(this)" href="javascript:" th:if="${user?.hasPerm('commentDelete',comment.userId)}" th:text="#{delete}">删除</a>
+                                </div>
+                            </li>
+                        </ul>
+                        <div><a class="small text-black-50" href="javascript:" th:onclick="|$('#answerComment${answer.id}').toggle()|" th:text="#{addComment}">我要评论</a></div>
+                        <div th:id="|answerComment${answer.id}|" class="mt-1" th:classappend="${comments.size() gt 0}?'hidden'">
+                            <th:block th:if="${user}">
+                                <form th:id="|answerCommentForm${answer.id}|" th:action="@{/api/comments/answer}" method="POST">
+                                    <div class="form-group mb-2">
+                                        <textarea class="form-control" name="markdown" rows="2" required autocomplete="off" th:placeholder="#{comment.markdown.placeholder}"
+                                                  onkeydown="if(event.ctrlKey && event.key==='Enter'){$(this.form).submit();return false;}" aria-label="markdown"></textarea>
+                                    </div>
+                                    <input type="hidden" name="refId" th:value="${answer.id}">
+                                    <button class="btn btn-outline-secondary btn-sm" type="submit" th:text="#{submit}"></button>
+                                </form>
+                                <script th:inline="javascript">
+                                    $(function () {
+                                        $(/*[[|#answerCommentForm${answer.id}|]]*/'').validate({
+                                            submitHandler: function (form) {
+                                                request(form.action, {method: form.method, body: $(form).serializeJSON()}).then(function (data) {
+                                                    if (data === null) return;
+                                                    showSuccess();
+                                                    location.reload();
+                                                });
+                                            }
+                                        });
+                                    });
+                                </script>
+                            </th:block>
+                            <div th:unless="${user}" class="alert alert-warning" th:text="#{error.login.answer}"></div>
+                        </div>
+                    </div>
+                </li>
+            </th:block>
+        </ul>
+        <nav class="mt-2" th:unless="${answer}" th:insert="|${theme}/fragment/pagination| :: pagination(${beans})" th:with="anchor='#answers'" th:if="${beans.pages>1}"></nav>
+        <script th:replace="|${theme}/fragment/pagination| :: adjust_page"></script>
+    </div>
+    <div class="container">
+        <h3 class="h5 pt-4 border-top" th:text="#{answerQuestion}">我来回答</h3>
+        <th:block th:if="${user}">
+            <form id="validForm" th:action="@{/api/answers}" method="POST">
+                <div class="form-group">
+                    <textarea id="markdown" name="markdown" class="d-none" required autocomplete="off" aria-label="markdown"></textarea>
+                </div>
+                <input type="hidden" name="questionId" th:value="${question.id}">
+                <button type="submit" class="btn btn-primary" th:text="#{submit}"></button>
+            </form>
+            <script th:inline="javascript">
+                $(function () {
+                    const mde = new SimpleMDE({
+                        element: document.getElementById('markdown'),
+                        placeholder: /*[[#{answer.markdown.placeholder}]]*/"",
+                        forceSync: true,
+                        tabSize: 4,
+                        indentWithTabs: false,
+                        hideIcons: ['guide', 'heading'],
+                        showIcons: ['code'],
+                        status: false,
+                        spellChecker: false,
+                        autoDownloadFontAwesome: false
+                    });
+                    codemirrorPaste(mde.codemirror, /*[[@{/api/upload_image}]]*/ '/api/upload_image');
+                    mde.codemirror.on('keydown', function (instance, event) {
+                        if (event.ctrlKey && event.key === 'Enter') {
+                            event.preventDefault();
+                            $("#validForm").submit();
+                        }
+                    });
+
+                    $('#validForm').validate({
+                        ignore: ':hidden:not(textarea)',
+                        submitHandler: function (form) {
+                            request(form.action, {method: form.method, body: $(form).serializeJSON()}).then(function (data) {
+                                if (data === null) return;
+                                showSuccess();
+                                location.reload();
+                            });
+                        }
+                    });
+                });
+            </script>
+        </th:block>
+        <div th:unless="${user}" class="alert alert-warning" th:text="#{error.login.answer}"></div>
+    </div>
+</th:block>
+
+<!-- 评论修改 -->
+<div class="modal fade" id="commentEditModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <form id="commentEditForm" th:action="@{/api/comments(_method=PUT)}" method="POST">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" th:text="#{comments}">评论</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group mb-2">
+                        <textarea class="form-control" name="markdown" rows="3" required autocomplete="off" th:placeholder="#{comment.markdown.placeholder}" aria-label="markdown"
+                                  onkeydown="if(event.ctrlKey && event.key==='Enter'){$(this.form).submit();return false;}"></textarea>
+                    </div>
+                    <input type="hidden" name="id">
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary" type="submit" th:text="#{submit}"></button>
+                </div>
+            </div>
+        </form>
+        <script th:inline="javascript">
+            $(function () {
+                $('#commentEditForm').validate({
+                    submitHandler: function (form) {
+                        request(form.action, {method: form.method, body: $(form).serializeJSON()}).then(function (data) {
+                            if (data === null) return;
+                            showSuccess();
+                            location.reload();
+                        });
+                    }
+                });
+            });
+        </script>
+    </div>
+</div>
+<script>
+    function editComment(element) {
+        $('#commentEditModal [name=markdown]').val($(element).data('markdown'));
+        $('#commentEditModal [name=id]').val($(element).data('id'));
+        $('#commentEditModal').modal('show');
+    }
+</script>
+<footer th:replace="|${theme}/fragment/common| :: footer"></footer>
+<div th:replace="|${theme}/fragment/photoswipe| :: html"></div>
+<script>initPhotoSwipeFromDOM('.markdown-body img');</script>
+<script th:inline="javascript">
+    function deleteQuestion(element) {
+        $.confirm({
+            title: '', content: /*[[#{confirmDelete}]]*/'', buttons: {
+                confirm: {
+                    text: /*[[#{ok}]]*/'', btnClass: 'btn-blue', keys: ['enter'], action: function () {
+                        request(/*[[@{/api/questions(_method=DELETE)}]]*/'', {method: 'POST', body: [$(element).data('id')]}).then(function (data) {
+                            if (data === null) return;
+                            showSuccess();
+                            location.href = /*[[@{/}]]*/'/';
+                        });
+                    }
+                },
+                cancel: {text: /*[[#{cancel}]]*/''}
+            }
+        });
+        return false;
+    }
+
+    function deleteAnswer(element) {
+        $.confirm({
+            title: '', content: /*[[#{confirmDelete}]]*/'', buttons: {
+                confirm: {
+                    text: /*[[#{ok}]]*/'', btnClass: 'btn-blue', keys: ['enter'], action: function () {
+                        request(/*[[@{/api/answers(_method=DELETE)}]]*/"", {method: 'POST', body: [$(element).data("id")]}).then(function (data) {
+                            if (data === null) return;
+                            showSuccess();
+                            location.reload();
+                        });
+                    }
+                },
+                cancel: {text: /*[[#{cancel}]]*/''}
+            }
+        });
+        return false;
+    }
+
+    function deleteComment(element) {
+        $.confirm({
+            title: '', content: /*[[#{confirmDelete}]]*/'', buttons: {
+                confirm: {
+                    text: /*[[#{ok}]]*/'', btnClass: 'btn-blue', keys: ['enter'], action: function () {
+                        request(/*[[@{/api/comments(_method=DELETE)}]]*/'', {method: 'POST', body: [$(element).data('id')]}).then(function (data) {
+                            if (data === null) return;
+                            showSuccess();
+                            location.reload();
+                        });
+                    }
+                },
+                cancel: {text: /*[[#{cancel}]]*/''}
+            }
+        });
+        return false;
+    }
+</script>
+<script th:replace="|${theme}/fragment/common| :: access_log"></script>
+</body>
+</html>

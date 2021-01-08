@@ -1,0 +1,483 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.jspbb</groupId>
+    <artifactId>jspbb</artifactId>
+    <version>1.0.0-beta</version>
+    <packaging>war</packaging>
+    <!--<packaging>jar</packaging>-->
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <!--<version>2.4.0</version>-->
+        <version>2.3.7.RELEASE</version>
+    </parent>
+    <properties>
+        <!-- mybatis-spring-boot-starter 2.0 以上版本 会引用 MyBatis 3.5 以上版本，导致OffsetDateTime出错。该问题与MySQL驱动也有关。-->
+        <!-- 相关参考资料：https://blog.csdn.net/zjcsuct/article/details/107754870 -->
+        <!--<mybatis-spring-boot-starter.version>2.1.4</mybatis-spring-boot-starter.version>-->
+        <!--<mybatis-spring-boot-starter.version>2.0.1</mybatis-spring-boot-starter.version>-->
+        <mybatis-spring-boot-starter.version>1.3.5</mybatis-spring-boot-starter.version>
+        <!--<pagehelper-spring-boot-starter.version>1.3.0</pagehelper-spring-boot-starter.version>-->
+        <pagehelper-spring-boot-starter.version>1.2.13</pagehelper-spring-boot-starter.version>
+        <spring-boot-starter-mobile.version>1.5.22.RELEASE</spring-boot-starter-mobile.version>
+        <!-- Apache公共基础组件 -->
+        <commons-lang3.version>3.5</commons-lang3.version>
+        <commons-collections.version>3.2.2</commons-collections.version>
+        <!--<commons-collections4.version>4.1</commons-collections4.version>-->
+        <commons-io.version>2.6</commons-io.version>
+        <!-- Apache公共网络组件 -->
+        <commons-net.version>3.6</commons-net.version>
+        <!-- HTML解析组件 -->
+        <jsoup.version>1.11.3</jsoup.version>
+        <!-- HTML不安全代码过滤组件 -->
+        <!--<owasp-java-html-sanitizer.version>20180219.1</owasp-java-html-sanitizer.version>-->
+        <!-- 使用 jgit 比较字符串区别 -->
+        <java-diff-utils.version>4.0</java-diff-utils.version>
+        <!-- 安全框架 -->
+        <shiro.version>1.7.0</shiro.version>
+<!--        <shiro.version>1.4.0</shiro.version>-->
+        <java-jwt.version>3.11.0</java-jwt.version>
+<!--        <buji-pac4j.version>5.0.1</buji-pac4j.version>-->
+        <buji-pac4j.version>3.0.0</buji-pac4j.version>
+<!--        <pac4j-core.version>4.2.0</pac4j-core.version>-->
+        <pac4j-core.version>2.1.0</pac4j-core.version>
+        <!-- 缓存组件 -->
+        <ehcache-core.version>2.6.11</ehcache-core.version>
+        <!-- 验证码组件 -->
+        <jcaptcha.version>2.0.0</jcaptcha.version>
+        <!-- 纯 java 图片处理库 -->
+        <thumbnailator.version>0.4.8</thumbnailator.version>
+        <!-- GraphicsMagick 原生图片处理库调用组件 -->
+        <im4java.version>1.4.0</im4java.version>
+        <!-- IP定位组件 -->
+        <ip2region.version>1.7.2</ip2region.version>
+        <!-- 用户代理解析组件。分析用户浏览器类型、操作系统等信息 -->
+        <UserAgentUtils.version>1.21</UserAgentUtils.version>
+        <!-- Markdown解析组件 -->
+        <commonmark.version>0.11.0</commonmark.version>
+        <!-- 阿里云短信组件 -->
+        <aliyun-java-sdk-core.version>3.6.0</aliyun-java-sdk-core.version>
+        <aliyun-java-sdk-dysmsapi.version>1.1.0</aliyun-java-sdk-dysmsapi.version>
+        <!-- 微信组件 -->
+        <weixin4j.version>1.7.8</weixin4j.version>
+        <!-- 腾讯云对象存储 -->
+        <cos_api.version>5.4.2</cos_api.version>
+        <!-- 七牛云对象存储 -->
+        <qiniu-java-sdk.version>7.2.12</qiniu-java-sdk.version>
+        <!-- 阿里云对象存储 -->
+        <aliyun-sdk-oss.version>3.1.0</aliyun-sdk-oss.version>
+
+        <!--<springloaded.version>1.2.7.RELEASE</springloaded.version>-->
+
+        <start-class>com.jspbb.core.Application</start-class>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <java.version>1.8</java.version>
+<!--        <kotlin.version>1.4.10</kotlin.version>-->
+        <kotlin.version>1.3.61</kotlin.version>
+<!--        <kotlin.version>1.3.21</kotlin.version>-->
+        <!-- kotlin增量编译 加上之后会导致java编译不会附带参数名 -->
+        <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
+
+        <!-- JDBC驱动 -->
+        <jdbc.driver.groupId>mysql</jdbc.driver.groupId>
+        <jdbc.driver.artifactId>mysql-connector-java</jdbc.driver.artifactId>
+        <!-- 5.1.24可以兼容MySQL5.0，但不兼容MySQL5.7，根据数据库版本选择 (5.1.24 JDBC版本为4.0，不支持jdk8的LocalDateTime，至少使用5.1.38，JDBC版本为4.2。数据库最低5.5，没有必要再兼容5.0和5.1) -->
+        <jdbc.driver.version>5.1.44</jdbc.driver.version>
+        <jdbc.driverClassName>com.mysql.jdbc.Driver</jdbc.driverClassName>
+    </properties>
+    <dependencies>
+        <!-- spring boot web -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <!-- https://docs.spring.io/spring-boot/docs/2.1.1.RELEASE/reference/html/configuration-metadata.html#configuration-metadata-annotation-processor -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-websocket</artifactId>
+        </dependency>
+        <!-- spring boot CSRF protection -->
+        <!--<dependency>-->
+        <!--<groupId>org.springframework.security</groupId>-->
+        <!--<artifactId>spring-security-web</artifactId>-->
+        <!--</dependency>-->
+        <!-- mybatis 分页 -->
+        <dependency>
+            <groupId>org.mybatis.spring.boot</groupId>
+            <artifactId>mybatis-spring-boot-starter</artifactId>
+            <version>${mybatis-spring-boot-starter.version}</version>
+        </dependency>
+        <!-- mybatis 分页 -->
+        <dependency>
+            <groupId>com.github.pagehelper</groupId>
+            <artifactId>pagehelper-spring-boot-starter</artifactId>
+            <version>${pagehelper-spring-boot-starter.version}</version>
+        </dependency>
+        <!-- spring boot thymeleaf -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-commons</artifactId>
+        </dependency>
+        <!-- spring boot mail -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
+        <!-- spring boot mobile -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mobile</artifactId>
+            <version>${spring-boot-starter-mobile.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>${commons-lang3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-collections</groupId>
+            <artifactId>commons-collections</artifactId>
+            <version>${commons-collections.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>${commons-io.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-net</groupId>
+            <artifactId>commons-net</artifactId>
+            <version>${commons-net.version}</version>
+        </dependency>
+        <!-- 解析 html 和过滤危险html代码 -->
+        <dependency>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+            <version>${jsoup.version}</version>
+        </dependency>
+        <!-- 过滤危险 html 代码 -->
+        <!--<dependency>-->
+        <!--<groupId>com.googlecode.owasp-java-html-sanitizer</groupId>-->
+        <!--<artifactId>owasp-java-html-sanitizer</artifactId>-->
+        <!--<version>${owasp-java-html-sanitizer.version}</version>-->
+        <!--</dependency>-->
+        <!-- 使用 jgit 比较字符串区别 -->
+        <dependency>
+            <groupId>io.github.java-diff-utils</groupId>
+            <artifactId>java-diff-utils</artifactId>
+            <version>${java-diff-utils.version}</version>
+        </dependency>
+        <!-- 缓存组件 -->
+        <dependency>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.ehcache</groupId>
+            <artifactId>ehcache-core</artifactId>
+            <version>${ehcache-core.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.shiro</groupId>
+            <artifactId>shiro-spring</artifactId>
+            <version>${shiro.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.shiro</groupId>
+            <artifactId>shiro-ehcache</artifactId>
+            <version>${shiro.version}</version>
+        </dependency>
+        <!-- JWT 组件 -->
+        <dependency>
+            <groupId>com.auth0</groupId>
+            <artifactId>java-jwt</artifactId>
+            <version>${java-jwt.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.module</groupId>
+            <artifactId>jackson-module-kotlin</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>io.buji</groupId>
+            <artifactId>buji-pac4j</artifactId>
+            <version>${buji-pac4j.version}</version>
+        </dependency>
+        <!-- shiro cas 整合 -->
+        <dependency>
+            <groupId>org.pac4j</groupId>
+            <artifactId>pac4j-cas</artifactId>
+            <version>${pac4j-core.version}</version>
+        </dependency>
+        <!-- shiro oauth 整合 -->
+        <dependency>
+            <groupId>org.pac4j</groupId>
+            <artifactId>pac4j-oauth</artifactId>
+            <version>${pac4j-core.version}</version>
+        </dependency>
+
+        <!-- 验证码组件 -->
+        <dependency>
+            <groupId>io.leopard.thirdparty</groupId>
+            <artifactId>jcaptcha-core</artifactId>
+            <version>${jcaptcha.version}</version>
+        </dependency>
+        <!-- 纯 java 图片压缩组件 -->
+        <dependency>
+            <groupId>net.coobird</groupId>
+            <artifactId>thumbnailator</artifactId>
+            <version>${thumbnailator.version}</version>
+        </dependency>
+        <!-- 调用 gmagick 处理图片的接口库 -->
+        <dependency>
+            <groupId>org.im4java</groupId>
+            <artifactId>im4java</artifactId>
+            <version>${im4java.version}</version>
+        </dependency>
+        <!-- IP 地址库 -->
+        <dependency>
+            <groupId>org.lionsoul</groupId>
+            <artifactId>ip2region</artifactId>
+            <version>${ip2region.version}</version>
+        </dependency>
+        <!-- IP 地址库 -->
+        <dependency>
+            <groupId>eu.bitwalker</groupId>
+            <artifactId>UserAgentUtils</artifactId>
+            <version>${UserAgentUtils.version}</version>
+        </dependency>
+        <!-- Markdown 组件 -->
+        <dependency>
+            <groupId>com.atlassian.commonmark</groupId>
+            <artifactId>commonmark</artifactId>
+            <version>${commonmark.version}</version>
+        </dependency>
+        <!-- 阿里云短信组件 -->
+        <dependency>
+            <groupId>com.aliyun</groupId>
+            <artifactId>aliyun-java-sdk-core</artifactId>
+            <version>${aliyun-java-sdk-core.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.aliyun</groupId>
+            <artifactId>aliyun-java-sdk-dysmsapi</artifactId>
+            <version>${aliyun-java-sdk-dysmsapi.version}</version>
+        </dependency>
+        <!-- 微信组件 -->
+        <dependency>
+            <groupId>com.foxinmy</groupId>
+            <artifactId>weixin4j-mp</artifactId>
+            <version>${weixin4j.version}</version>
+        </dependency>
+        <!-- 腾讯云对象存储 -->
+        <dependency>
+            <groupId>com.qcloud</groupId>
+            <artifactId>cos_api</artifactId>
+            <version>${cos_api.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!-- 七牛云对象存储 -->
+        <dependency>
+            <groupId>com.qiniu</groupId>
+            <artifactId>qiniu-java-sdk</artifactId>
+            <version>${qiniu-java-sdk.version}</version>
+        </dependency>
+        <!-- 阿里云对象存储 -->
+        <dependency>
+            <groupId>com.aliyun.oss</groupId>
+            <artifactId>aliyun-sdk-oss</artifactId>
+            <version>${aliyun-sdk-oss.version}</version>
+        </dependency>
+
+        <!-- spring boot将snakeyaml设置为运行时(runtime)依赖，代码里使用了snakeyaml，这里设置为编译期(compile)依赖 -->
+        <!--<dependency>-->
+        <!--<groupId>org.yaml</groupId>-->
+        <!--<artifactId>snakeyaml</artifactId>-->
+        <!--</dependency>-->
+        <dependency>
+            <groupId>${jdbc.driver.groupId}</groupId>
+            <artifactId>${jdbc.driver.artifactId}</artifactId>
+            <version>${jdbc.driver.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- 快速启动启动应用，类似热部署 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <!-- 打包成war需要设置scope为provided -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <!-- spring boot test -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.junit.vintage</groupId>
+                    <artifactId>junit-vintage-engine</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!-- kotlin -->
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-stdlib-jdk8</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-reflect</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-test-junit</artifactId>
+            <version>${kotlin.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+    <build>
+        <!-- java代码kotlin代码可以混搭编写，不需要将kotlin代码放到另外的目录 -->
+        <!--<sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>-->
+        <!--<testSourceDirectory>${project.basedir}/src/test/kotlin</testSourceDirectory>-->
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <excludes>
+                    <exclude>application.properties</exclude>
+                </excludes>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>application.properties</include>
+                </includes>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <!-- 指定启动的入口类 -->
+                    <!--<mainClass>com.jspbb.core.ApplicationKt</mainClass>-->
+                    <!-- 关闭fork。否则使用spring-boot:run启动时无法调试程序 -->
+                    <fork>false</fork>
+                    <!-- 如果启用fork，并且使用spring-boot:run可以调试，则要使用以下配置，并且配合idea的run remote debug功能。太复杂，还特别容易导致端口占用。-->
+                    <!--<jvmArguments>-->
+                    <!-- -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005-->
+                    <!--</jvmArguments>-->
+                </configuration>
+                <!-- 使用pringloaded热加载，修改文件后需要Build Project，并且关闭spring.devtools.restart.enabled -->
+                <!--<dependencies>-->
+                <!--<dependency>-->
+                <!--<groupId>org.springframework</groupId>-->
+                <!--<artifactId>springloaded</artifactId>-->
+                <!--<version>${springloaded.version}</version>-->
+                <!--</dependency>-->
+                <!--</dependencies>-->
+            </plugin>
+            <!-- 编译配置参考 http://kotlinlang.org/docs/reference/using-maven.html 和 http://start.spring.io/ 生成的kotlin工程-->
+            <plugin>
+                <groupId>org.jetbrains.kotlin</groupId>
+                <artifactId>kotlin-maven-plugin</artifactId>
+                <version>${kotlin.version}</version>
+                <configuration>
+                    <args>
+                        <arg>-Xjsr305=strict</arg>
+                    </args>
+                    <compilerPlugins>
+                        <plugin>spring</plugin>
+                    </compilerPlugins>
+                </configuration>
+                <dependencies>
+                    <!-- 配合上面的<compilerPlugins><plugin>spring</plugin></compilerPlugins>可以将kotlin代码中包含@Bean @Configuration注解的类、方法自动加上open关键字，避免因默认为final导致报错 -->
+                    <dependency>
+                        <groupId>org.jetbrains.kotlin</groupId>
+                        <artifactId>kotlin-maven-allopen</artifactId>
+                        <version>${kotlin.version}</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <executions>
+                    <!-- Replacing default-compile as it is treated specially by maven -->
+                    <execution>
+                        <id>default-compile</id>
+                        <phase>none</phase>
+                    </execution>
+                    <!-- Replacing default-testCompile as it is treated specially by maven -->
+                    <execution>
+                        <id>default-testCompile</id>
+                        <phase>none</phase>
+                    </execution>
+                    <execution>
+                        <id>java-compile</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>java-test-compile</id>
+                        <phase>test-compile</phase>
+                        <goals>
+                            <goal>testCompile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.mybatis.generator</groupId>
+                <artifactId>mybatis-generator-maven-plugin</artifactId>
+                <version>1.3.5</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>${jdbc.driver.groupId}</groupId>
+                        <artifactId>${jdbc.driver.artifactId}</artifactId>
+                        <version>${jdbc.driver.version}</version>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <!--<overwrite>true</overwrite>-->
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

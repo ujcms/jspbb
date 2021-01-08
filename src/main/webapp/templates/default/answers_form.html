@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>[[#{editAnswer}]] - [[${configs.base.siteName}]]</title>
+    <meta name="keywords" th:content="${configs.base.siteKeywords}">
+    <meta name="description" th:content="${configs.base.siteDescription}">
+    <link th:replace="|${theme}/fragment/common| :: css">
+    <link th:replace="|${theme}/fragment/common| :: css_simplemde">
+    <script th:replace="|${theme}/fragment/common| :: js"></script>
+    <script th:replace="|${theme}/fragment/common| :: js_simplemde"></script>
+    <style>
+        .CodeMirror, .CodeMirror-scroll {
+            min-height: 350px;
+        }
+    </style>
+</head>
+<body>
+<div th:replace="|${theme}/fragment/show_error| :: show_error"></div>
+<div th:replace="|${theme}/fragment/common| :: browser_upgrade"></div>
+<header th:replace="|${theme}/fragment/common| :: header"></header>
+<div th:replace="|${theme}/questions_show| :: question"></div>
+<div class="container mt-2">
+    <h3 class="h5 pt-4 border-top" th:text="#{editAnswer}"></h3>
+    <form id="validForm" th:action="@{/api/answers(_method=PUT)}" method="POST">
+        <div class="form-group">
+            <textarea id="markdown" name="markdown" th:text="${answer?.ext?.markdown}" class="d-none" autocomplete="off"> </textarea>
+            <script th:inline="javascript">
+                var mde = new SimpleMDE({
+                    element: document.getElementById('markdown'),
+                    placeholder: /*[[#{answer.markdown.placeholder}]]*/'',
+                    forceSync: true,
+                    tabSize:4,
+                    indentWithTabs:false,
+                    hideIcons: ['guide', 'heading'],
+                    showIcons: ['code'],
+                    status: false,
+                    spellChecker: false,
+                    autoDownloadFontAwesome: false
+                });
+                codemirrorPaste(mde.codemirror, /*[[@{/api/upload_image}]]*/ "/api/upload_image");
+                mde.codemirror.on("keydown", function(instance, event){
+                    if (event.ctrlKey && event.keyCode === 13) {
+                        event.preventDefault();
+                        $("#validForm").submit();
+                    }
+                });
+            </script>
+        </div>
+        <input type="hidden" name="id" th:value="${answer?.id}"/>
+        <button type="submit" class="btn btn-primary" th:text="#{submit}"></button>
+    </form>
+</div>
+<footer th:replace="|${theme}/fragment/common| :: footer"></footer>
+<script th:inline="javascript">
+    $(function () {
+        $("#validForm").validate({
+            submitHandler: function (form) {
+                request(form.action, {method: form.method, body: $(form).serializeJSON()}).then(function (data) {
+                    if (data === null) return;
+                    showSuccess();
+                    var url = /*[[@{/questions/{id}/answers/(id=${question.id})}]]*/'/';
+                    location.href =  url + data.id;
+                });
+            }
+        });
+    })
+</script>
+<script th:replace="|${theme}/fragment/common| :: access_log"></script>
+</body>
+</html>

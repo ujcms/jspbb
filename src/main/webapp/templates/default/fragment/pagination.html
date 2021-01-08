@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+
+<th:block th:fragment="pagination(beans)" th:object="${beans}" th:with="first=*{pageNum==1},last=*{pageNum==pages}">
+    <ul class="pagination" th:with="begin=*{pageNum+1-3},begin=${begin<2}?2:${begin},end=${begin+4},end=${end>=beans.pages}?*{pages-1}:${end},begin=${end-begin<4}?${end-4}:${begin},begin=${begin<2}?2:${begin}">
+        <li class="page-item" th:classappend="${first}?'disabled'">
+            <span th:if="${first}" class="page-link">
+                <span aria-hidden="true">&laquo;</span>
+            </span>
+            <a th:unless="${first}" class="page-link" th:href="${#jspbb.paging(beans.pageNum-1, anchor)}" th:aria-label="#{pagination.prev}">
+                <span aria-hidden="true">&laquo;</span>
+            </a>
+        </li>
+        <li class="page-item" th:with="curr=*{pageNum==1}" th:classappend="${curr}?'active'">
+            <span th:if="${curr}" class="page-link">1</span>
+            <a th:unless="${curr}" class="page-link text-nowrap" th:href="${#jspbb.paging(1, anchor)}">1<span th:if="*{pageNum>4 && pages>7}" class="d-none d-sm-inline"> ...</span><span th:if="*{pageNum>2 && pages>3}" class="d-inline d-sm-none"> ...</span></a>
+        </li>
+        <li class="page-item" th:if="${end>=begin}" th:each="i:${#numbers.sequence(begin,end)}" th:with="curr=${beans.pageNum==i}" th:classappend="${curr}?'active':(${!((i==beans.pageNum+1&&i==2) || (i==beans.pageNum-1&&i==beans.pages-1))}?'d-none d-sm-block')">
+            <span th:if="${curr}" th:text="${i}" class="page-link"></span>
+            <a th:unless="${curr}" th:text="${i}" class="page-link" th:href="${#jspbb.paging(i, anchor)}"></a>
+        </li>
+        <li class="page-item" th:if="*{pages>1}" th:with="curr=*{pageNum==pages}" th:classappend="${curr}?'active'">
+            <span th:if="${curr}" th:text="*{pages}" class="page-link">1</span>
+            <a th:unless="${curr}" class="page-link text-nowrap" th:href="${#jspbb.paging(beans.pages, anchor)}"><span th:if="*{pages-pageNum>=4 && pages>7}" class="d-none d-sm-inline">... </span><span th:if="*{pages-pageNum>=2 && pages>3}" class="d-inline d-sm-none">... </span>[[*{pages}]]</a>
+        </li>
+        <li class="page-item" th:classappend="${last}?'disabled'">
+            <span th:if="${last}" class="page-link" th:aria-label="#{pagination.next}">
+                <span aria-hidden="true">&raquo;</span>
+            </span>
+            <a th:unless="${last}" class="page-link" th:href="${#jspbb.paging(beans.pageNum+1, anchor)}" th:aria-label="#{pagination.next}">
+                <span aria-hidden="true">&raquo;</span>
+            </a>
+        </li>
+    </ul>
+</th:block>
+
+<script th:fragment="adjust_page" th:inline="javascript" th:if="${beans.pageNum>1 && beans.pageNum>beans.pages}">
+    location.href = /*[[${#jspbb.paging(beans.pages)}]]*/"/";
+</script>
+
+<div th:fragment="no_data" class="alert alert-warning" role="alert" th:text="#{noData}"></div>
+
+</body>
+</html>

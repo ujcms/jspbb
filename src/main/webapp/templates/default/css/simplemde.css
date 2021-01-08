@@ -1,0 +1,55 @@
+.CodeMirror {
+    padding: 4px;
+}
+
+.CodeMirror-fullscreen {
+    top: 36px;
+}
+
+.editor-toolbar {
+    padding: 0 6px;
+}
+
+.editor-toolbar:before {
+    margin-bottom: 4px;
+}
+
+.editor-toolbar:after {
+    margin-top: 4px
+}
+
+.editor-toolbar a {
+    width: 26px;
+    height: 26px;
+}
+
+.editor-toolbar a:before {
+    line-height: 26px;
+}
+
+.editor-toolbar i.separator {
+    margin: 0 2px;
+}
+
+.editor-toolbar.fullscreen {
+    height: 36px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+}
+
+.editor-toolbar.fullscreen::before, .editor-toolbar.fullscreen::after {
+    height: 36px;
+}
+
+.editor-preview-side {
+    padding: 8px;
+    top: 36px;
+}
+
+.CodeMirror {
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+}
+
+.CodeMirror span.cm-comment {
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+}

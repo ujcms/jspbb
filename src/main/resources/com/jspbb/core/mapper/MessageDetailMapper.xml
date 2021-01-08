@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jspbb.core.mapper.MessageDetailMapper">
+    <resultMap id="BaseResultMap" type="com.jspbb.core.domain.MessageDetail">
+        <id column="id_" jdbcType="BIGINT" property="id"/>
+        <result column="title_" jdbcType="VARCHAR" property="title"/>
+        <result column="markdown_" jdbcType="CLOB" property="markdown"/>
+        <result column="referred_count_" jdbcType="INTEGER" property="referredCount"/>
+        <result column="ip_" jdbcType="VARCHAR" property="ip"/>
+        <result column="ip_country_" jdbcType="VARCHAR" property="ipCountry"/>
+        <result column="ip_province_" jdbcType="VARCHAR" property="ipProvince"/>
+        <result column="ip_city_" jdbcType="VARCHAR" property="ipCity"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id_, title_, markdown_, referred_count_, ip_, ip_country_, ip_province_, ip_city_
+    </sql>
+    <select id="select" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from jspbb_message_detail
+        where id_ = #{id,jdbcType=BIGINT}
+    </select>
+    <delete id="delete" parameterType="java.lang.Long">
+        delete from jspbb_message_detail
+        where id_ = #{id,jdbcType=BIGINT}
+    </delete>
+    <insert id="insert" parameterType="com.jspbb.core.domain.Message">
+        insert into jspbb_message_detail (<include refid="Base_Column_List"/>)
+        values (#{id,jdbcType=BIGINT}, #{title,jdbcType=VARCHAR}, #{markdown,jdbcType=CLOB}, #{referredCount,jdbcType=INTEGER},
+        #{ip,jdbcType=VARCHAR}, #{ipCountry,jdbcType=VARCHAR},#{ipProvince,jdbcType=VARCHAR}, #{ipCity,jdbcType=VARCHAR})
+    </insert>
+    <update id="update" parameterType="com.jspbb.core.domain.Message">
+        update jspbb_message_detail
+        set title_          = #{title,jdbcType=VARCHAR},
+            markdown_       = #{markdown,jdbcType=CLOB},
+            referred_count_ = #{markdown,jdbcType=INTEGER},
+            ip_             = #{ip,jdbcType=VARCHAR},
+            ip_country_        = #{ipCountry,jdbcType=VARCHAR},
+            ip_province_       = #{ipProvince,jdbcType=VARCHAR},
+            ip_city_           = #{ipCity,jdbcType=VARCHAR}
+        where id_ = #{id,jdbcType=BIGINT}
+    </update>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        <include refid="com.jspbb.core.mapper.SeqMapper.Select_All">
+            <property name="tableName" value="jspbb_message_detail"/>
+        </include>
+    </select>
+
+    <update id="minusReferredCount">
+        UPDATE jspbb_message_detail
+        SET referred_count_ = referred_count_ - 1
+        WHERE id_ IN (<foreach item="id" collection="ids" separator=",">#{id}</foreach>)
+    </update>
+    <delete id="deleteOrphan" parameterType="java.lang.Long">
+        DELETE FROM jspbb_message_detail
+        WHERE id_ IN (<foreach item="id" collection="ids" separator=",">#{id}</foreach>) AND referred_count_ &lt;= 0
+    </delete>
+</mapper>

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>[[${status}]]</title>
+    <!--<meta name="robots" content="noindex,nofollow,noarchive">-->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="renderer" content="webkit">
+    <link rel="stylesheet" th:href="@{/vendor/bootstrap/dist/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/vendor/fontawesome-free/css/all.min.css}">
+</head>
+<body class="p-2">
+<h1><span th:text="${status}"></span> <small th:text="#{error.http.500}"></small></h1>
+<p>path: [[${path}]]</p>
+<p>timestamp: <span th:text="${#dates.format(timestamp,'yyyy-MM-dd''T''HH:mm:ss.SSSXX')}"></span></p>
+<!--<p>error: <span th:text="${error}"></span></p>-->
+<!--<p>exception: <span th:text="${exception}"></span></p>-->
+<p th:if="${message}"><code th:text="${message}"></code></p>
+<pre th:if="${trace}" style="white-space:pre-wrap;word-wrap:break-word;"><code th:text="${trace}"></code></pre>
+<script th:src="@{/vendor/jquery/dist/jquery.min.js}"></script>
+<script th:src="@{/vendor/popper.js/dist/umd/popper.min.js}"></script>
+<script th:src="@{/vendor/bootstrap/dist/js/bootstrap.min.js}"></script>
+</body>
+</html>

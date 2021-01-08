@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>[[#{settings.profile}]] - [[${configs.base.siteName}]]</title>
+    <meta name="keywords" th:content="${configs.base.siteKeywords}">
+    <meta name="description" th:content="${configs.base.siteDescription}">
+    <link th:replace="|${theme}/fragment/common| :: css">
+    <link th:replace="|${theme}/fragment/common| :: css_simplemde">
+    <!--<link rel="stylesheet" th:href="@{/vendor/bootstrap-datepicker/dist/css/bootstrap-datepicker3.min.css}">-->
+    <link rel="stylesheet" th:href="@{/vendor/flatpickr/dist/flatpickr.min.css}">
+    <script th:replace="|${theme}/fragment/common| :: js"></script>
+</head>
+<body>
+<div th:replace="|${theme}/fragment/show_error| :: show_error"></div>
+<div th:replace="|${theme}/fragment/common| :: browser_upgrade"></div>
+<header th:replace="|${theme}/fragment/common| :: header"></header>
+<div class="container mt-2">
+    <div class="row">
+        <div class="col-sm-3">
+            <div class="list-group mt-2" th:fragment="left(name)">
+                <a class="list-group-item list-group-item-action" th:classappend="${name==null}?'active'" th:href="@{/settings/profile}" th:text="#{settings.profile}"></a>
+                <a class="list-group-item list-group-item-action" th:classappend="${name=='picture'}?'active'" th:href="@{/settings/picture}" th:text="#{settings.picture}"></a>
+                <a class="list-group-item list-group-item-action" th:classappend="${name=='account'}?'active'" th:href="@{/settings/account}" th:text="#{settings.account}"></a>
+            </div>
+        </div>
+        <div class="col-sm-9">
+            <h3 class="py-3 border-bottom" th:text="#{settings.profile}"></h3>
+            <form id="validForm" class="mt-3" th:action="@{/api/settings/profile(_method=PUT)}" method="POST">
+                <div class="form-group">
+                    <label for="username" th:text="#{user.username}"></label>
+                    <input type="text" class="form-control" id="username" th:value="${user.username}" disabled>
+                </div>
+                <div class="form-group">
+                    <label for="title" th:text="#{user.title}"></label>
+                    <input type="text" class="form-control" id="title" name="title" th:value="${user.ext.title}" maxlength="40" autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label for="location" th:text="#{user.location}"></label>
+                    <input type="text" class="form-control" id="location" name="location" maxlength="100" th:value="${user.ext.location}">
+                </div>
+                <div class="form-group">
+                    <label for="gender" th:text="#{user.gender}"></label>
+                    <select class="form-control" id="gender" name="gender">
+                        <option value="n" th:text="#{secret}"></option>
+                        <option value="m" th:selected="${user.ext.gender == 'm'}" th:text="#{male}"></option>
+                        <option value="f" th:selected="${user.ext.gender == 'f'}" th:text="#{female}"></option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="birthday_local" th:text="#{user.birthday}"></label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="far fa-calendar-alt text-black-50"></i></span>
+                        </div>
+                        <input type="text" class="form-control datepicker date" id="birthday_local" name="birthday_local" th:data-init-value="${user.ext.birthday}" onchange="if(this.value) $('#birthday').val(dayjs(this.value).toJSON()); else $('#birthday').val('')" autocomplete="off">
+                        <input type="hidden" id="birthday" name="birthday">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary" th:text="#{save}"></button>
+            </form>
+        </div>
+    </div>
+</div>
+<footer th:replace="|${theme}/fragment/common| :: footer"></footer>
+<script th:replace="|${theme}/fragment/common| :: js_simplemde"></script>
+<!--<script th:src="@{/vendor/bootstrap-datepicker/dist/flatpickr.min.js}"></script>-->
+<script th:src="@{/vendor/flatpickr/dist/flatpickr.min.js}"></script>
+<script th:src="@{/vendor/flatpickr/dist/l10n/index.js}"></script>
+<script th:inline="javascript">
+    $(function () {
+        $('.datepicker').each(function () {
+            $(this).val(dayjs($(this).data('init-value')).format('YYYY-MM-DD')).change().flatpickr({
+                locale: 'zh',
+                allowInput: true,
+                // enableTime: true,
+                // time_24hr: true,
+                // minuteIncrement: 1,
+                // enableSeconds: true,
+                dateFormat: 'Y-m-d'
+            });
+        });
+        //$('.datepicker').datepicker({format: 'yyyy-mm-dd'});
+        // $('.datepicker').flatpickr({
+        //     locale: 'zh',
+        //     allowInput: true,
+        //     // enableTime: true,
+        //     // time_24hr: true,
+        //     // minuteIncrement: 1,
+        //     // enableSeconds: true,
+        //     dateFormat: 'Y-m-d'
+        // });
+        $('#validForm').validate({
+            submitHandler: function (form) {
+                request(form.action, {method: form.method, body: $(form).serializeJSON()}).then(function (data) {
+                    if (data === null) return;
+                    showSuccess();
+                    location.reload();
+                });
+            }
+        });
+    });
+</script>
+<script th:replace="|${theme}/fragment/common| :: access_log"></script>
+</body>
+</html>

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:p="http://www.springframework.org/schema/p" xmlns:c="http://www.springframework.org/schema/c"
+       xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+        <property name="securityManager" ref="securityManager"/>
+        <property name="loginUrl" value="/sign_in"/>
+        <property name="filters">
+            <util:map>
+                <!--<entry key="backSite" value-ref="backSiteFilter" />-->
+                <entry key="authc">
+                    <bean class="com.jspbb.core.security.ShiroAuthenticationFilter"/>
+                </entry>
+                <entry key="user">
+                    <bean class="com.jspbb.core.security.ShiroUserFilter"/>
+                </entry>
+                <entry key="logout">
+                    <bean class="com.jspbb.core.security.ShiroLogoutFilter">
+                        <!-- 防止 CSRF 攻击，只允许 POST 方式退出登录 -->
+                        <property name="postOnlyLogout" value="true"/>
+                    </bean>
+                </entry>
+            </util:map>
+        </property>
+        <property name="filterChainDefinitions">
+            <value>
+                / = anon
+
+                /sign_in = authc
+                /logout = logout
+                /my/** = user
+            </value>
+        </property>
+    </bean>
+    <!-- Shiro Filter -->
+    <bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+        <property name="realm" ref="dbRealm"/>
+        <property name="cacheManager" ref="shiroEhcacheManager"/>
+        <property name="rememberMeManager" ref="rememberMeManager"/>
+    </bean>
+
+    <!-- 项目自定义的Realm -->
+    <bean id="dbRealm" class="com.jspbb.core.security.ShiroDbRealm" p:authorizationCachingEnabled="false"/>
+
+    <!-- 加密方式 -->
+    <bean id="credentialsDigest" class="com.jspbb.util.security.SHA256CredentialsDigest" p:useSalt="true"/>
+
+    <!-- 用户授权信息Cache, 采用EhCache -->
+    <bean id="shiroEhcacheManager" class="org.apache.shiro.cache.ehcache.EhCacheManager">
+        <property name="cacheManagerConfigFile" value="classpath:config/shiro-ehcache.xml"/>
+    </bean>
+    <!-- Remember Me Cookie -->
+    <bean id="rememberMeCookie" class="org.apache.shiro.web.servlet.SimpleCookie">
+        <constructor-arg value="rememberMe"/>
+        <property name="httpOnly" value="true"/>
+        <!-- Cookie过期时间，30天。单位：秒。默认Cookie过期时间为一年。 -->
+        <property name="maxAge" value="2592000"/>
+    </bean>
+    <!-- Remember Me Manager。集群时需设置 encryptionCipherKey 和 decryptionCipherKey，否则每台机器的 KEY 不同可能导致Remember Me功能失效。 -->
+    <bean id="rememberMeManager" class="org.apache.shiro.web.mgt.CookieRememberMeManager" p:cookie-ref="rememberMeCookie"/>
+
+    <!-- 保证实现了Shiro内部lifecycle函数的bean执行 -->
+    <bean id="lifecycleBeanPostProcessor" class="org.apache.shiro.spring.LifecycleBeanPostProcessor"/>
+
+    <!-- Enabling Shiro Annotations: http://shiro.apache.org/spring.html#enabling-shiro-annotations -->
+    <!-- p:proxyTargetClass="true" 必须设置，使用CGLIB。否则会因重复代理而出现错误 -->
+    <bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator" depends-on="lifecycleBeanPostProcessor" p:proxyTargetClass="true"/>
+    <bean class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor" p:securityManager-ref="securityManager"/>
+
+    <!-- 第三方登录 id 格式为{provider}OAuthClient; callback格式为{site_url}/oauth/callback/{provider}-->
+    <!-- weixin -->
+    <bean id="weixinOAuthClient" class="com.jspbb.core.security.oauth.OAuthClientWeixin">
+        <constructor-arg name="key" value="${oauth.client.weixin.key}"/>
+        <constructor-arg name="secret" value="${oauth.client.weixin.secret}"/>
+        <constructor-arg name="callback" value="${oauth.client.weixin.callback}"/>
+    </bean>
+    <!-- qq -->
+    <bean id="qqOAuthClient" class="com.jspbb.core.security.oauth.OAuthClientQq">
+        <constructor-arg name="key" value="${oauth.client.qq.key}"/>
+        <constructor-arg name="secret" value="${oauth.client.qq.secret}"/>
+        <constructor-arg name="callback" value="${oauth.client.qq.callback}"/>
+    </bean>
+    <!-- weibo -->
+    <bean id="weiboOAuthClient" class="com.jspbb.core.security.oauth.OAuthClientWeibo">
+        <constructor-arg name="key" value="${oauth.client.weibo.key}"/>
+        <constructor-arg name="secret" value="${oauth.client.weibo.secret}"/>
+        <constructor-arg name="callback" value="${oauth.client.weibo.callback}"/>
+    </bean>
+</beans>

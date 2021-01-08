@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jspbb.core.mapper.AttachMapper">
+    <resultMap id="BaseResultMap" type="com.jspbb.core.domain.Attach">
+        <id column="id_" jdbcType="BIGINT" property="id"/>
+        <result column="user_id_" jdbcType="BIGINT" property="userId"/>
+        <result column="name_" jdbcType="VARCHAR" property="name"/>
+        <result column="url_" jdbcType="VARCHAR" property="url"/>
+        <result column="orig_name_" jdbcType="VARCHAR" property="origName"/>
+        <result column="length_" jdbcType="BIGINT" property="length"/>
+        <result column="date_" jdbcType="TIMESTAMP" property="date"/>
+        <result column="ip_" jdbcType="VARCHAR" property="ip"/>
+        <result column="ip_country_" jdbcType="VARCHAR" property="ipCountry"/>
+        <result column="ip_province_" jdbcType="VARCHAR" property="ipProvince"/>
+        <result column="ip_city_" jdbcType="VARCHAR" property="ipCity"/>
+        <result column="used_" jdbcType="BOOLEAN" property="used"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id_, user_id_, name_, url_, orig_name_, length_, date_, ip_, ip_country_, ip_province_, ip_city_, used_
+    </sql>
+    <select id="select" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from jspbb_attach
+        where id_ = #{id,jdbcType=BIGINT}
+    </select>
+    <delete id="delete" parameterType="java.lang.Long">
+        delete
+        from jspbb_attach
+        where id_ = #{id,jdbcType=BIGINT}
+    </delete>
+    <insert id="insert" parameterType="com.jspbb.core.domain.Attach">
+        insert into jspbb_attach (<include refid="Base_Column_List"/>)
+        values (#{id,jdbcType=BIGINT}, #{userId,jdbcType=BIGINT}, #{name,jdbcType=VARCHAR}, #{url,jdbcType=VARCHAR},
+        #{origName,jdbcType=VARCHAR}, #{length,jdbcType=BIGINT}, #{date,jdbcType=TIMESTAMP}, #{ip,jdbcType=VARCHAR},
+        #{ipCountry,jdbcType=VARCHAR}, #{ipProvince,jdbcType=VARCHAR}, #{ipCity,jdbcType=VARCHAR}, #{used,jdbcType=BOOLEAN}
+        )
+    </insert>
+    <update id="update" parameterType="com.jspbb.core.domain.Attach">
+        update jspbb_attach
+        set user_id_     = #{userId,jdbcType=BIGINT},
+            name_        = #{name,jdbcType=VARCHAR},
+            url_         = #{url,jdbcType=VARCHAR},
+            orig_name_   = #{origName,jdbcType=VARCHAR},
+            length_      = #{length,jdbcType=BIGINT},
+            date_        = #{date,jdbcType=TIMESTAMP},
+            ip_          = #{ip,jdbcType=VARCHAR},
+            ip_country_  = #{ipCountry,jdbcType=VARCHAR},
+            ip_province_ = #{ipProvince,jdbcType=VARCHAR},
+            ip_city_     = #{ipCity,jdbcType=VARCHAR},
+            used_        = #{used,jdbcType=BOOLEAN}
+        where id_ = #{id,jdbcType=BIGINT}
+    </update>
+
+    <select id="selectByName" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from jspbb_attach
+        where name_ = #{name,jdbcType=BIGINT}
+    </select>
+
+    <select id="selectByUrl" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from jspbb_attach
+        where url_ = #{name,jdbcType=BIGINT}
+    </select>
+</mapper>

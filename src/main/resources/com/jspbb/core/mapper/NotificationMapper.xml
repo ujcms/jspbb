@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jspbb.core.mapper.NotificationMapper">
+    <resultMap id="BaseResultMap" type="com.jspbb.core.domain.Notification">
+        <id column="id_" jdbcType="BIGINT" property="id"/>
+        <result column="user_id_" jdbcType="BIGINT" property="userId"/>
+        <result column="type_" jdbcType="VARCHAR" property="type"/>
+        <result column="data_" jdbcType="VARCHAR" property="data"/>
+        <result column="created_" jdbcType="TIMESTAMP" property="created"/>
+        <result column="body_" jdbcType="VARCHAR" property="body"/>
+        <result column="url_" jdbcType="VARCHAR" property="url"/>
+        <association property="user" javaType="com.jspbb.core.domain.User" column="user_id_" select="com.jspbb.core.mapper.UserMapper.select"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id_, user_id_, type_, data_, created_, body_, url_
+    </sql>
+    <select id="select" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from jspbb_notification
+        where id_ = #{id,jdbcType=BIGINT}
+    </select>
+    <delete id="delete" parameterType="java.lang.Long">
+        delete from jspbb_notification
+        where id_ = #{id,jdbcType=BIGINT}
+    </delete>
+    <insert id="insert" parameterType="com.jspbb.core.domain.Notification">
+        insert into jspbb_notification (<include refid="Base_Column_List"/>)
+        values (#{id,jdbcType=BIGINT}, #{userId,jdbcType=BIGINT}, #{type,jdbcType=VARCHAR},#{data,jdbcType=VARCHAR},
+        #{created,jdbcType=TIMESTAMP}, #{body,jdbcType=VARCHAR}, #{url,jdbcType=VARCHAR})
+    </insert>
+    <update id="update" parameterType="com.jspbb.core.domain.Notification">
+        update jspbb_notification
+        set user_id_ = #{userId,jdbcType=BIGINT},
+            type_    = #{type,jdbcType=VARCHAR},
+            data_    = #{data,jdbcType=VARCHAR},
+            created_ = #{created,jdbcType=TIMESTAMP},
+            body_    = #{body,jdbcType=VARCHAR},
+            url_     = #{url,jdbcType=VARCHAR}
+        where id_ = #{id,jdbcType=BIGINT}
+    </update>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        <include refid="com.jspbb.core.mapper.SeqMapper.Select_All">
+            <property name="tableName" value="jspbb_notification"/>
+        </include>
+    </select>
+
+    <delete id="deleteByTypeAndData">
+        DELETE FROM jspbb_notification
+        WHERE user_id_ = #{userId} AND type_ = #{type} AND data_ = #{data}
+    </delete>
+    <select id="countByUserId" resultType="long">
+        SELECT COUNT(*)
+        FROM jspbb_notification
+        WHERE user_id_ = #{userId}
+    </select>
+</mapper>

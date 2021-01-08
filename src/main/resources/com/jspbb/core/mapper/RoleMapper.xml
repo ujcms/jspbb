@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jspbb.core.mapper.RoleMapper">
+    <resultMap id="BaseResultMap" type="com.jspbb.core.domain.Role">
+        <id column="id_" jdbcType="BIGINT" property="id"/>
+        <result column="name_" jdbcType="VARCHAR" property="name"/>
+        <result column="description_" jdbcType="VARCHAR" property="description"/>
+        <result column="perms_" jdbcType="CLOB" property="perms"/>
+        <result column="order_" jdbcType="INTEGER" property="order"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id_, name_, description_, perms_, order_
+    </sql>
+    <select id="select" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from jspbb_role
+        where id_ = #{id,jdbcType=BIGINT}
+    </select>
+    <delete id="delete" parameterType="java.lang.Long">
+        delete from jspbb_role
+        where id_ = #{id,jdbcType=BIGINT}
+    </delete>
+    <insert id="insert" parameterType="com.jspbb.core.domain.Role">
+        insert into jspbb_role (<include refid="Base_Column_List"/>)
+        values (#{id,jdbcType=BIGINT}, #{name,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR}, #{perms,jdbcType=LONGVARCHAR}, #{order, jdbcType=INTEGER} )
+    </insert>
+    <update id="update" parameterType="com.jspbb.core.domain.Role">
+        update jspbb_role
+        set name_        = #{name,jdbcType=VARCHAR},
+            description_ = #{description,jdbcType=VARCHAR},
+            perms_       = #{perms,jdbcType=CLOB},
+            order_       = #{order,jdbcType=INTEGER}
+        where id_ = #{id,jdbcType=BIGINT}
+    </update>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        <include refid="com.jspbb.core.mapper.SeqMapper.Select_All">
+            <property name="tableName" value="jspbb_role"/>
+        </include>
+    </select>
+
+    <update id="updateOrder">
+        update jspbb_role
+        set order_ = #{order,jdbcType=INTEGER}
+        where id_ = #{id,jdbcType=BIGINT}
+    </update>
+
+    <select id="selectByUserId" resultMap="BaseResultMap">
+        SELECT r.*
+        FROM jspbb_role r
+            JOIN jspbb_user_role ur ON r.id_ = ur.role_id_
+        WHERE ur.user_id_ = #{userId}
+    </select>
+</mapper>

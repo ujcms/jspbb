@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jspbb.core.mapper.UserOpenidMapper">
+    <resultMap id="BaseResultMap" type="com.jspbb.core.domain.UserOpenid">
+        <result column="user_id_" jdbcType="BIGINT" property="userId"/>
+        <result column="provider_" jdbcType="VARCHAR" property="provider"/>
+        <result column="openid_" jdbcType="VARCHAR" property="openid"/>
+        <result column="unionid_" jdbcType="VARCHAR" property="unionid"/>
+        <result column="display_name_" jdbcType="VARCHAR" property="displayName"/>
+        <result column="gender_" jdbcType="VARCHAR" property="gender"/>
+        <result column="picture_url_" jdbcType="VARCHAR" property="pictureUrl"/>
+        <result column="large_picture_url_" jdbcType="VARCHAR" property="largePictureUrl"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        user_id_, provider_, openid_, unionid_, display_name_, gender_, picture_url_, large_picture_url_
+    </sql>
+    <insert id="insert" parameterType="com.jspbb.core.domain.UserOpenid">
+        INSERT INTO jspbb_user_openid (<include refid="Base_Column_List"/>)
+        VALUES (#{userId,jdbcType=BIGINT}, #{provider,jdbcType=VARCHAR}, #{openid,jdbcType=VARCHAR},
+        #{unionid,jdbcType=VARCHAR},#{displayName,jdbcType=VARCHAR}, #{gender,jdbcType=VARCHAR},
+        #{pictureUrl,jdbcType=VARCHAR}, #{largePictureUrl,jdbcType=VARCHAR})
+    </insert>
+    <update id="update" parameterType="com.jspbb.core.domain.UserOpenid">
+        UPDATE jspbb_user_openid
+        SET openid_            = #{openid,jdbcType=VARCHAR},
+            unionid_           = #{unionid,jdbcType=VARCHAR},
+            display_name_      = #{displayName,jdbcType=VARCHAR},
+            gender_            = #{gender,jdbcType=VARCHAR},
+            picture_url_       = #{pictureUrl,jdbcType=VARCHAR},
+            large_picture_url_ = #{largePictureUrl,jdbcType=VARCHAR}
+        WHERE user_id_ = #{userId,jdbcType=BIGINT} AND provider_ = #{provider,jdbcType=VARCHAR}
+    </update>
+    <select id="selectByUserId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM jspbb_user_openid
+        WHERE user_id_ = #{userId,jdbcType=BIGINT}
+    </select>
+    <delete id="deleteByUserId">
+        delete from jspbb_user_openid
+        where user_id_ = #{userId,jdbcType=BIGINT}
+    </delete>
+</mapper>

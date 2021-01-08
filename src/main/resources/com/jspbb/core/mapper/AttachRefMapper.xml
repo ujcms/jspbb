@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jspbb.core.mapper.AttachRefMapper">
+    <resultMap id="BaseResultMap" type="com.jspbb.core.domain.AttachRef">
+        <result column="attach_id_" jdbcType="BIGINT" property="attachId"/>
+        <result column="ref_type_" jdbcType="VARCHAR" property="refType"/>
+        <result column="ref_id_" jdbcType="BIGINT" property="refId"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        attach_id_, ref_type_, ref_id_
+    </sql>
+    <select id="select" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from jspbb_attach_ref
+        where attach_id_ = #{attachId,jdbcType=BIGINT} and ref_type_ = #{refType,jdbcType=VARCHAR} and ref_id_ = #{refId,jdbcType=BIGINT}
+    </select>
+    <delete id="delete">
+        delete from jspbb_attach_ref
+        where attach_id_ = #{attachId,jdbcType=BIGINT} and ref_type_ = #{refType,jdbcType=VARCHAR} and ref_id_ = #{refId,jdbcType=BIGINT}
+    </delete>
+    <insert id="insert" parameterType="com.jspbb.core.domain.AttachRef">
+        insert into jspbb_attach_ref (<include refid="Base_Column_List"/>)
+        values (#{attachId,jdbcType=BIGINT}, #{refType,jdbcType=VARCHAR},#{refId,jdbcType=BIGINT})
+    </insert>
+
+    <select id="selectByAttachId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM jspbb_attach_ref
+        WHERE attach_id_ = #{id,jdbcType=BIGINT}
+    </select>
+    <select id="countByAttachId" resultType="long">
+        SELECT COUNT(*)
+        FROM jspbb_attach_ref
+        WHERE attach_id_ = #{id,jdbcType=BIGINT}
+    </select>
+</mapper>

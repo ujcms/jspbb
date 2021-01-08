@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jspbb.core.mapper.IpRestrictMapper">
+    <resultMap id="BaseResultMap" type="com.jspbb.core.domain.IpRestrict">
+        <id column="ip_" jdbcType="VARCHAR" property="ip"/>
+        <id column="name_" jdbcType="VARCHAR" property="name"/>
+        <result column="count_" jdbcType="BIGINT" property="count"/>
+        <result column="start_" jdbcType="TIMESTAMP" property="start"/>
+        <result column="last_" jdbcType="TIMESTAMP" property="last"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        ip_, name_, count_, start_, last_
+    </sql>
+    <select id="select" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from jspbb_ip_restrict
+        where ip_ = #{ip,jdbcType=VARCHAR} and name_ = #{name,jdbcType=VARCHAR}
+    </select>
+    <delete id="delete">
+        delete
+        from jspbb_ip_restrict
+        where ip_ = #{ip,jdbcType=VARCHAR}
+          and name_ = #{name,jdbcType=VARCHAR}
+    </delete>
+    <insert id="insert" parameterType="com.jspbb.core.domain.IpRestrict">
+        insert into jspbb_ip_restrict (<include refid="Base_Column_List"/>)
+        values (#{ip,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{count,jdbcType=BIGINT}, #{start,jdbcType=TIMESTAMP}, #{last,jdbcType=TIMESTAMP})
+    </insert>
+    <update id="update" parameterType="com.jspbb.core.domain.IpRestrict">
+        update jspbb_ip_restrict
+        set count_ = #{count,jdbcType=BIGINT},
+            start_ = #{start,jdbcType=TIMESTAMP},
+            last_  = #{last,jdbcType=TIMESTAMP}
+        where ip_ = #{ip,jdbcType=VARCHAR}
+          and name_ = #{name,jdbcType=VARCHAR}
+    </update>
+    <select id="selectByIp" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM jspbb_ip_restrict
+        WHERE ip_ = #{ip,jdbcType=VARCHAR}
+    </select>
+    <delete id="deleteByIp">
+        delete
+        from jspbb_ip_restrict
+        where ip_ = #{ip,jdbcType=VARCHAR}
+    </delete>
+</mapper>

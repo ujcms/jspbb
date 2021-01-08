@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jspbb.core.mapper.AccessExtMapper">
+    <resultMap id="BaseResultMap" type="com.jspbb.core.domain.AccessExt">
+        <id column="id_" jdbcType="BIGINT" property="id"/>
+        <result column="url_" jdbcType="VARCHAR" property="url"/>
+        <result column="referrer_" jdbcType="VARCHAR" property="referrer"/>
+        <result column="user_agent_" jdbcType="VARCHAR" property="userAgent"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id_, url_, referrer_, user_agent_
+    </sql>
+    <select id="select" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from jspbb_access_ext
+        where id_ = #{id,jdbcType=BIGINT}
+    </select>
+    <delete id="delete" parameterType="java.lang.Long">
+        delete from jspbb_access_ext
+        where id_ = #{id,jdbcType=BIGINT}
+    </delete>
+    <insert id="insert" parameterType="com.jspbb.core.domain.AccessExt">
+        insert into jspbb_access_ext (<include refid="Base_Column_List"/>)
+        values (#{id,jdbcType=BIGINT}, #{url,jdbcType=VARCHAR}, #{referrer,jdbcType=VARCHAR}, #{userAgent,jdbcType=VARCHAR})
+    </insert>
+    <update id="update" parameterType="com.jspbb.core.domain.AccessExt">
+        update jspbb_access_ext
+        set url_        = #{url,jdbcType=VARCHAR},
+            referrer_   = #{referrer,jdbcType=VARCHAR},
+            user_agent_ = #{userAgent,jdbcType=VARCHAR}
+        where id_ = #{id,jdbcType=BIGINT}
+    </update>
+</mapper>

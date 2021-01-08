@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx" xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:p="http://www.springframework.org/schema/p" xmlns:c="http://www.springframework.org/schema/c"
+       xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd"
+       default-lazy-init="true">
+    <!-- 验证码配置 -->
+    <!-- 验证码仓库 -->
+    <bean id="captchaStore" class="com.octo.captcha.service.captchastore.FastHashMapCaptchaStore"/>
+    <!-- 验证码字符。验证码中使用的字符，去掉一些容易混淆的字符，比如i、1 -->
+    <bean id="wordGen" class="com.octo.captcha.component.word.wordgenerator.RandomWordGenerator">
+        <constructor-arg value="ABCDEGHJKLMNRSTUWXY235689235689"/>
+    </bean>
+    <!-- 验证码字体 -->
+    <bean id="fontGen" class="com.octo.captcha.component.image.fontgenerator.RandomFontGenerator">
+        <!-- 最小字体 -->
+        <constructor-arg index="0" value="30"/>
+        <!-- 最大字体 -->
+        <constructor-arg index="1" value="30"/>
+        <constructor-arg index="2">
+            <list>
+<!--                <bean class="java.awt.Font">-->
+<!--                    <constructor-arg index="0" value="Bell MT"/>-->
+<!--                    <constructor-arg index="1" type="int" value="0"/>-->
+<!--                    <constructor-arg index="2" type="int" value="30"/>-->
+<!--                </bean>-->
+                <bean class="java.awt.Font">
+                    <constructor-arg index="0" value="Times New Roman"/>
+                    <constructor-arg index="1" type="int" value="0"/>
+                    <constructor-arg index="2" type="int" value="30"/>
+                </bean>
+<!--                <bean class="java.awt.Font">-->
+<!--                    <constructor-arg index="0" value="nyala"/>-->
+<!--                    <constructor-arg index="1" type="int" value="1"/>-->
+<!--                    <constructor-arg index="2" type="int" value="30"/>-->
+<!--                </bean>-->
+<!--                <bean class="java.awt.Font">-->
+<!--                    <constructor-arg index="0" value="Credit valley"/>-->
+<!--                    <constructor-arg index="1" type="int" value="1"/>-->
+<!--                    <constructor-arg index="2" type="int" value="30"/>-->
+<!--                </bean>-->
+            </list>
+        </constructor-arg>
+        <constructor-arg index="3" value="false"/>
+    </bean>
+    <!-- 验证码颜色 -->
+    <bean id="colorGen" class="com.octo.captcha.component.image.color.RandomListColorGenerator">
+        <constructor-arg>
+            <list>
+<!--                <bean class="java.awt.Color">-->
+<!--                    <constructor-arg index="0" type="int" value="23"/>-->
+<!--                    <constructor-arg index="1" type="int" value="170"/>-->
+<!--                    <constructor-arg index="2" type="int" value="27"/>-->
+<!--                </bean>-->
+<!--                <bean class="java.awt.Color">-->
+<!--                    <constructor-arg index="0" type="int" value="220"/>-->
+<!--                    <constructor-arg index="1" type="int" value="34"/>-->
+<!--                    <constructor-arg index="2" type="int" value="11"/>-->
+<!--                </bean>-->
+                <bean class="java.awt.Color">
+                    <constructor-arg index="0" type="int" value="23"/>
+                    <constructor-arg index="1" type="int" value="67"/>
+                    <constructor-arg index="2" type="int" value="172"/>
+                </bean>
+            </list>
+        </constructor-arg>
+    </bean>
+    <!-- 验证码背景 -->
+    <bean id="backGen" class="com.octo.captcha.component.image.backgroundgenerator.UniColorBackgroundGenerator">
+        <!-- 背景宽 -->
+        <constructor-arg index="0" value="120"/>
+        <!-- 背景高 -->
+        <constructor-arg index="1" value="36"/>
+        <!-- 背景颜色 -->
+        <constructor-arg index="2">
+            <bean class="java.awt.Color">
+                <constructor-arg index="0" type="int" value="255"/>
+                <constructor-arg index="1" type="int" value="255"/>
+                <constructor-arg index="2" type="int" value="255"/>
+            </bean>
+            <!-- <util:constant static-field="java.awt.Color.white"/> -->
+        </constructor-arg>
+    </bean>
+    <!-- 验证码引擎 -->
+    <bean id="gmailCaptchaEngine" class="com.jspbb.util.captcha.GmailCaptchaEngine">
+        <constructor-arg index="0" ref="wordGen"/>
+        <constructor-arg index="1" ref="fontGen"/>
+        <constructor-arg index="2" ref="colorGen"/>
+        <constructor-arg index="3" ref="backGen"/>
+        <!-- 验证最小个数 -->
+        <constructor-arg index="4" value="6"/>
+        <!-- 验证最大个数 -->
+        <constructor-arg index="5" value="6"/>
+        <!-- 字符扭曲程度0-100，越大越难识别 -->
+        <constructor-arg index="6" value="50"/>
+    </bean>
+    <!-- 验证码Service -->
+    <bean id="captchaService" class="com.jspbb.util.captcha.TrialManageableImageCaptchaService">
+        <constructor-arg index="0" ref="captchaStore"/>
+        <constructor-arg index="1" ref="gmailCaptchaEngine"/>
+        <constructor-arg index="2" type="int" value="180"/>
+        <constructor-arg index="3" type="int" value="100000"/>
+        <constructor-arg index="4" type="int" value="75000"/>
+    </bean>
+    <bean id="captchaProperties" class="com.jspbb.util.captcha.CaptchaTokenService$CaptchaProperties"/>
+    <!-- 基于 Token 的验证码，用于无状态 RESTful 请求 -->
+    <bean id="captchaTokenService" class="com.jspbb.util.captcha.CaptchaTokenService" c:gmailCaptchaEngine-ref="gmailCaptchaEngine" c:properties-ref="captchaProperties"/>
+</beans>

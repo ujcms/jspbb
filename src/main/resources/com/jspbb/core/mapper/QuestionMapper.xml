@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jspbb.core.mapper.QuestionMapper">
+    <resultMap id="BaseResultMap" type="com.jspbb.core.domain.Question">
+        <id column="id_" jdbcType="BIGINT" property="id"/>
+        <result column="user_id_" jdbcType="BIGINT" property="userId"/>
+        <result column="edit_user_id_" jdbcType="BIGINT" property="editUserId"/>
+        <result column="active_user_id_" jdbcType="BIGINT" property="activeUserId"/>
+        <result column="created_" jdbcType="TIMESTAMP" property="created"/>
+        <result column="edit_date_" jdbcType="TIMESTAMP" property="editDate"/>
+        <result column="active_date_" jdbcType="TIMESTAMP" property="activeDate"/>
+        <result column="status_" jdbcType="INTEGER" property="status"/>
+        <result column="ups_" jdbcType="INTEGER" property="ups"/>
+        <result column="downs_" jdbcType="INTEGER" property="downs"/>
+        <result column="answer_count_" jdbcType="INTEGER" property="answerCount"/>
+        <result column="favorite_count_" jdbcType="INTEGER" property="favoriteCount"/>
+        <result column="comment_count_" jdbcType="INTEGER" property="commentCount"/>
+        <result column="views_" jdbcType="BIGINT" property="views"/>
+        <association property="user" javaType="com.jspbb.core.domain.User" column="user_id_" select="com.jspbb.core.mapper.UserMapper.select"/>
+        <association property="editUser" javaType="com.jspbb.core.domain.User" column="edit_user_id_" select="com.jspbb.core.mapper.UserMapper.select"/>
+        <association property="activeUser" javaType="com.jspbb.core.domain.User" column="active_user_id_" select="com.jspbb.core.mapper.UserMapper.select"/>
+        <association property="ext" javaType="com.jspbb.core.domain.QuestionExt" column="id_" select="com.jspbb.core.mapper.QuestionExtMapper.select"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id_, user_id_, edit_user_id_, active_user_id_, created_, edit_date_, active_date_, status_, ups_, downs_,
+        answer_count_, favorite_count_, comment_count_, views_
+    </sql>
+    <select id="select" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from jspbb_question
+        where id_ = #{id,jdbcType=BIGINT}
+    </select>
+    <delete id="delete" parameterType="java.lang.Long">
+        delete
+        from jspbb_question
+        where id_ = #{id,jdbcType=BIGINT}
+    </delete>
+    <insert id="insert" parameterType="com.jspbb.core.domain.Question">
+        insert into jspbb_question (<include refid="Base_Column_List"/>)
+        values (#{id,jdbcType=BIGINT}, #{userId,jdbcType=BIGINT}, #{editUserId,jdbcType=BIGINT}, #{activeUserId,jdbcType=BIGINT},
+        #{created,jdbcType=TIMESTAMP}, #{editDate,jdbcType=TIMESTAMP}, #{activeDate,jdbcType=TIMESTAMP}, #{status,jdbcType=INTEGER},
+        #{ups,jdbcType=INTEGER}, #{downs,jdbcType=INTEGER}, #{answerCount,jdbcType=INTEGER},
+        #{favoriteCount,jdbcType=INTEGER}, #{commentCount,jdbcType=INTEGER}, #{views,jdbcType=BIGINT})
+    </insert>
+    <update id="update" parameterType="com.jspbb.core.domain.Question">
+        update jspbb_question
+        set user_id_        = #{userId,jdbcType=BIGINT},
+            edit_user_id_   = #{editUserId,jdbcType=BIGINT},
+            active_user_id_ = #{activeUserId,jdbcType=BIGINT},
+            created_        = #{created,jdbcType=TIMESTAMP},
+            edit_date_      = #{editDate,jdbcType=TIMESTAMP},
+            active_date_    = #{activeDate,jdbcType=TIMESTAMP},
+            status_         = #{status,jdbcType=INTEGER},
+            ups_            = #{ups,jdbcType=INTEGER},
+            downs_          = #{downs,jdbcType=INTEGER},
+            answer_count_   = #{answerCount,jdbcType=INTEGER},
+            favorite_count_ = #{favoriteCount,jdbcType=INTEGER},
+            comment_count_  = #{commentCount,jdbcType=INTEGER},
+            views_          = #{views,jdbcType=BIGINT}
+        where id_ = #{id,jdbcType=BIGINT}
+    </update>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        <include refid="com.jspbb.core.mapper.SeqMapper.Select_All">
+            <property name="tableName" value="jspbb_question"/>
+        </include>
+    </select>
+</mapper>

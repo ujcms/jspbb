@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>[[#{messages}]] - [[${configs.base.siteName}]]</title>
+    <meta name="keywords" th:content="${configs.base.siteKeywords}">
+    <meta name="description" th:content="${configs.base.siteDescription}">
+    <link th:replace="|${theme}/fragment/common| :: css">
+    <link th:replace="|${theme}/fragment/common| :: css_simplemde">
+    <script th:replace="|${theme}/fragment/common| :: js"></script>
+    <script th:replace="|${theme}/fragment/common| :: js_simplemde"></script>
+</head>
+<body>
+<div th:replace="|${theme}/fragment/show_error| :: show_error"></div>
+<div th:replace="|${theme}/fragment/common| :: browser_upgrade"></div>
+<header th:replace="|${theme}/fragment/common| :: header"></header>
+<div class="container mt-2">
+    <div class="row">
+        <div class="col-sm-9" th:jspbb-messages-contact="beans" th:with="userId=${user.id},contactUserId=${contactUser.id},pageSize=20, pageable=true">
+            <div class="clearfix py-2">
+                <div class="float-left"><span th:text="#{message.to}"> </span> <strong th:text="${contactUser.username}"></strong></div>
+                <div class="float-right"><a th:href="@{/messages}" th:text="#{back}"></a></div>
+            </div>
+            <form id="messageForm" th:action="@{/api/messages}" method="POST">
+                <div class="form-group">
+                    <textarea class="form-control" id="markdown" name="markdown" rows="5" autocomplete="off" onkeydown="if(event.ctrlKey && event.keyCode === 13){$('#messageForm').submit();return false;}"></textarea>
+                </div>
+                <div class="text-right">
+                    <input type="hidden" name="toUserId" th:value="${contactUser.id}">
+                    <button type="submit" class="btn btn-primary" th:text="#{send}"></button>
+                </div>
+            </form>
+            <div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item px-0 d-flex" th:each="bean:${beans}" th:object="${bean}">
+                        <div><img src="" th:src="*{fromUser.ext.pictureUrlSmall}" class="rounded-circle" style="width:35px;height:35px;"></div>
+                        <div class="ml-2 flex-grow-1">
+                            <div><strong th:text="*{fromUser.username}"></strong></div>
+                            <div th:utext="*{detail.html}"></div>
+                            <div class="clearfix small mt-2">
+                                <div class="float-left"><span class="text-muted" th:text="*{#temporals.format(date, 'yyyy-MM-dd HH:mm')}"></span></div>
+                                <div class="float-right"><a class="ml-2" href="javascript:" onclick="deleteMessage(this);" th:data-message-id="*{id}" th:text="#{delete}"></a></div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+                <div class="mt-2" th:if="${beans.pages gt 1}" th:insert="|${theme}/fragment/pagination| :: pagination(${beans})"></div>
+                <script th:replace="|${theme}/fragment/pagination| :: adjust_page"></script>
+                <div class="mt-2" th:if="${#lists.isEmpty(beans)}" th:insert="|${theme}/fragment/pagination| :: no_data"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<footer th:replace="|${theme}/fragment/common| :: footer"></footer>
+<script th:inline="javascript">
+    function deleteMessage(element) {
+        $.confirm({
+            title: '', content: /*[[#{confirmDelete}]]*/'', buttons: {
+                confirm: {
+                    text: /*[[#{ok}]]*/'', btnClass: 'btn-blue', keys: ['enter'], action: function () {
+                        request(/*[[@{/api/messages(_method=DELETE)}]]*/'', {method: 'POST', body: $(element).data('message-id')}).then(function (data) {
+                            if (data === null) return;
+                            showSuccess();
+                            location.reload();
+                        });
+                    }
+                },
+                cancel: {text: /*[[#{cancel}]]*/''}
+            }
+        });
+    }
+
+    $(function () {
+        $("#messageForm").validate({
+            submitHandler: function (form) {
+                request(form.action, {method: form.method, body: $(form).serializeJSON()}).then(function (data) {
+                    if (data === null) return;
+                    showSuccess();
+                    location.reload();
+                });
+            }
+        });
+    });
+</script>
+<script th:replace="|${theme}/fragment/common| :: access_log"></script>
+</body>
+</html>

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jspbb.core.mapper.GroupMapper">
+    <resultMap id="BaseResultMap" type="com.jspbb.core.domain.Group">
+        <id column="id_" jdbcType="BIGINT" property="id"/>
+        <result column="name_" jdbcType="VARCHAR" property="name"/>
+        <result column="description_" jdbcType="VARCHAR" property="description"/>
+        <result column="type_" jdbcType="INTEGER" property="type"/>
+        <result column="reputation" jdbcType="INTEGER" property="reputation"/>
+        <result column="question_max_" jdbcType="INTEGER" property="questionMax"/>
+        <result column="question_within_" jdbcType="INTEGER" property="questionWithin"/>
+        <result column="answer_max_" jdbcType="INTEGER" property="answerMax"/>
+        <result column="answer_within_" jdbcType="INTEGER" property="answerWithin"/>
+        <result column="comment_max_" jdbcType="INTEGER" property="commentMax"/>
+        <result column="comment_within_" jdbcType="INTEGER" property="commentWithin"/>
+        <result column="message_max_" jdbcType="INTEGER" property="messageMax"/>
+        <result column="message_within_" jdbcType="INTEGER" property="messageWithin"/>
+        <result column="upload_max_" jdbcType="INTEGER" property="uploadMax"/>
+        <result column="upload_within_" jdbcType="INTEGER" property="uploadWithin"/>
+        <result column="order_" jdbcType="INTEGER" property="order"/>
+        <result column="is_trusted_" jdbcType="BOOLEAN" property="isTrusted"/>
+        <result column="perms_" jdbcType="CLOB" property="perms"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id_, name_, description_, type_, reputation, question_max_, question_within_, answer_max_,
+        answer_within_, comment_max_, comment_within_, message_max_, message_within_, upload_max_,
+        upload_within_, order_, is_trusted_, perms_
+    </sql>
+    <select id="select" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from jspbb_group
+        where id_ = #{id,jdbcType=BIGINT}
+    </select>
+    <delete id="delete" parameterType="java.lang.Long">
+        delete
+        from jspbb_group
+        where id_ = #{id,jdbcType=BIGINT}
+    </delete>
+    <insert id="insert" parameterType="com.jspbb.core.domain.Group">
+        insert into jspbb_group (<include refid="Base_Column_List"/>)
+        values (#{id,jdbcType=BIGINT}, #{name,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR}, #{type,jdbcType=INTEGER}, #{reputation,jdbcType=INTEGER}, #{questionMax,jdbcType=INTEGER},
+        #{questionWithin,jdbcType=INTEGER}, #{answerMax,jdbcType=INTEGER}, #{answerWithin,jdbcType=INTEGER}, #{commentMax,jdbcType=INTEGER}, #{commentWithin,jdbcType=INTEGER}, #{messageMax,jdbcType=INTEGER},
+        #{messageWithin,jdbcType=INTEGER}, #{uploadMax,jdbcType=INTEGER}, #{uploadWithin,jdbcType=INTEGER}, #{order,jdbcType=INTEGER}, #{isTrusted,jdbcType=BOOLEAN},
+        #{perms,jdbcType=CLOB})
+    </insert>
+    <update id="update" parameterType="com.jspbb.core.domain.Group">
+        update jspbb_group
+        set name_            = #{name,jdbcType=VARCHAR},
+            description_     = #{description,jdbcType=VARCHAR},
+            type_            = #{type,jdbcType=INTEGER},
+            reputation       = #{reputation,jdbcType=INTEGER},
+            question_max_    = #{questionMax,jdbcType=INTEGER},
+            question_within_ = #{questionWithin,jdbcType=INTEGER},
+            answer_max_      = #{answerMax,jdbcType=INTEGER},
+            answer_within_   = #{answerWithin,jdbcType=INTEGER},
+            comment_max_     = #{commentMax,jdbcType=INTEGER},
+            comment_within_  = #{commentWithin,jdbcType=INTEGER},
+            message_max_     = #{messageMax,jdbcType=INTEGER},
+            message_within_  = #{messageWithin,jdbcType=INTEGER},
+            upload_max_      = #{uploadMax,jdbcType=INTEGER},
+            upload_within_   = #{uploadWithin,jdbcType=INTEGER},
+            order_           = #{order,jdbcType=INTEGER},
+            is_trusted_      = #{isTrusted,jdbcType=BOOLEAN},
+            perms_           = #{perms,jdbcType=CLOB}
+        where id_ = #{id,jdbcType=BIGINT}
+    </update>
+    <select id="selectAll" resultMap="BaseResultMap">
+        <include refid="com.jspbb.core.mapper.SeqMapper.Select_All">
+            <property name="tableName" value="jspbb_group"/>
+        </include>
+    </select>
+    <update id="updateOrder">
+        update jspbb_group
+        set order_ = #{order,jdbcType=INTEGER}
+        where id_ = #{id,jdbcType=BIGINT}
+    </update>
+</mapper>

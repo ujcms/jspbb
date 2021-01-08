@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jspbb.core.mapper.UserExtMapper">
+    <resultMap id="BaseResultMap" type="com.jspbb.core.domain.UserExt">
+        <id column="id_" jdbcType="BIGINT" property="id"/>
+        <result column="password_" jdbcType="VARCHAR" property="password"/>
+        <result column="salt_" jdbcType="VARCHAR" property="salt"/>
+        <result column="gender_" jdbcType="VARCHAR" property="gender"/>
+        <result column="picture_url_" jdbcType="VARCHAR" property="pictureUrl"/>
+        <result column="picture_version_" jdbcType="INTEGER" property="pictureVersion"/>
+        <result column="title_" jdbcType="VARCHAR" property="title"/>
+        <result column="birthday_" jdbcType="DATE" property="birthday"/>
+        <result column="location_" jdbcType="VARCHAR" property="location"/>
+        <result column="ip_" jdbcType="VARCHAR" property="ip"/>
+        <result column="ip_country_" jdbcType="VARCHAR" property="ipCountry"/>
+        <result column="ip_province_" jdbcType="VARCHAR" property="ipProvince"/>
+        <result column="ip_city_" jdbcType="VARCHAR" property="ipCity"/>
+        <result column="login_date_" jdbcType="TIMESTAMP" property="loginDate"/>
+        <result column="login_ip_" jdbcType="VARCHAR" property="loginIp"/>
+        <result column="login_ip_country_" jdbcType="VARCHAR" property="loginIpCountry"/>
+        <result column="login_ip_province_" jdbcType="VARCHAR" property="loginIpProvince"/>
+        <result column="login_ip_city_" jdbcType="VARCHAR" property="loginIpCity"/>
+        <result column="login_count_" jdbcType="INTEGER" property="loginCount"/>
+        <result column="uploaded_length_" jdbcType="BIGINT" property="uploadedLength"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id_, password_, salt_, gender_, picture_url_, picture_version_, title_, birthday_, location_,
+        ip_, ip_country_, ip_province_, ip_city_, login_date_, login_ip_, login_ip_country_, login_ip_province_, login_ip_city_,
+        login_count_, uploaded_length_
+    </sql>
+    <select id="select" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from jspbb_user_ext
+        where id_ = #{id,jdbcType=BIGINT}
+    </select>
+    <delete id="delete" parameterType="java.lang.Long">
+        delete
+        from jspbb_user_ext
+        where id_ = #{id,jdbcType=BIGINT}
+    </delete>
+    <insert id="insert" parameterType="com.jspbb.core.domain.UserExt">
+        insert into jspbb_user_ext (<include refid="Base_Column_List"/>)
+        values (#{id,jdbcType=BIGINT}, #{password,jdbcType=VARCHAR}, #{salt,jdbcType=VARCHAR}, #{gender,jdbcType=VARCHAR},
+        #{pictureUrl,jdbcType=VARCHAR}, #{pictureVersion,jdbcType=INTEGER},#{title,jdbcType=VARCHAR},#{birthday,jdbcType=TIMESTAMP},#{location,jdbcType=VARCHAR},
+        #{ip,jdbcType=VARCHAR}, #{ipCountry,jdbcType=VARCHAR}, #{ipProvince,jdbcType=VARCHAR},
+        #{ipCity,jdbcType=VARCHAR}, #{loginDate,jdbcType=TIMESTAMP}, #{loginIp,jdbcType=VARCHAR},
+        #{loginIpCountry,jdbcType=VARCHAR}, #{loginIpProvince,jdbcType=VARCHAR}, #{loginIpCity,jdbcType=VARCHAR},
+        #{loginCount,jdbcType=INTEGER}, #{uploadedLength,jdbcType=BIGINT})
+    </insert>
+    <update id="update" parameterType="com.jspbb.core.domain.UserExt">
+        update jspbb_user_ext
+        set password_          = #{password,jdbcType=VARCHAR},
+            salt_              = #{salt,jdbcType=VARCHAR},
+            gender_            = #{gender,jdbcType=VARCHAR},
+            picture_url_       = #{pictureUrl,jdbcType=VARCHAR},
+            picture_version_   = #{pictureVersion,jdbcType=INTEGER},
+            title_             = #{title,jdbcType=VARCHAR},
+            birthday_          = #{birthday,jdbcType=TIMESTAMP},
+            location_          = #{location,jdbcType=VARCHAR},
+            ip_                = #{ip,jdbcType=VARCHAR},
+            ip_country_        = #{ipCountry,jdbcType=VARCHAR},
+            ip_province_       = #{ipProvince,jdbcType=VARCHAR},
+            ip_city_           = #{ipCity,jdbcType=VARCHAR},
+            login_date_        = #{loginDate,jdbcType=TIMESTAMP},
+            login_ip_          = #{loginIp,jdbcType=VARCHAR},
+            login_ip_country_  = #{loginIpCountry,jdbcType=VARCHAR},
+            login_ip_province_ = #{loginIpProvince,jdbcType=VARCHAR},
+            login_ip_city_     = #{loginIpCity,jdbcType=VARCHAR},
+            login_count_       = #{loginCount,jdbcType=INTEGER},
+            uploaded_length_   = #{uploadedLength,jdbcType=BIGINT}
+        where id_ = #{id,jdbcType=BIGINT}
+    </update>
+</mapper>

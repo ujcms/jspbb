@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jspbb.core.mapper.UserRoleMapper">
+    <resultMap id="BaseResultMap" type="com.jspbb.core.domain.UserRole">
+        <id column="user_id_" jdbcType="BIGINT" property="userId"/>
+        <id column="role_id_" jdbcType="BIGINT" property="roleId"/>
+    </resultMap>
+    <delete id="delete" parameterType="com.jspbb.core.domain.UserRole">
+        delete from jspbb_user_role
+        where user_id_ = #{userId,jdbcType=BIGINT}
+              and role_id_ = #{roleId,jdbcType=BIGINT}
+    </delete>
+    <insert id="insert" parameterType="com.jspbb.core.domain.UserRole">
+        insert into jspbb_user_role (user_id_, role_id_)
+        values (#{userId,jdbcType=BIGINT}, #{roleId,jdbcType=BIGINT})
+    </insert>
+
+    <delete id="deleteByUserId">
+        delete from jspbb_user_role
+        where user_id_ = #{userId,jdbcType=BIGINT}
+    </delete>
+    <delete id="deleteByRoleId">
+        delete from jspbb_user_role
+        where role_id_ = #{userId,jdbcType=BIGINT}
+    </delete>
+</mapper>

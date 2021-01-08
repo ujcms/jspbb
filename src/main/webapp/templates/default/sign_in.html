@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>[[#{signIn}]] - [[${configs.base.siteName}]]</title>
+    <meta name="keywords" th:content="${configs.base.siteKeywords}">
+    <meta name="description" th:content="${configs.base.siteDescription}">
+    <link th:replace="|${theme}/fragment/common| :: css">
+    <script th:replace="|${theme}/fragment/common| :: js"></script>
+</head>
+<body class="bg-light">
+<div th:replace="|${theme}/fragment/show_error| :: show_error"></div>
+<div th:replace="|${theme}/fragment/common| :: browser_upgrade"></div>
+<div class="container my-3 my-md-4 my-lg-5">
+    <div class="row justify-content-center">
+        <div class="col col-md-6 col-lg-5 col-xl-5 reg-box">
+            <h3 class="reg-logo text-center">
+                <a href="index.html" th:href="@{/}">jsp<b>BB</b></a> <span th:text="#{signIn}"></span>
+            </h3>
+            <div th:if="${shiroLoginFailure}" class="alert alert-warning alert-dismissible fade show" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <th:block th:switch="${shiroLoginFailure}">
+                    <span th:case="IncorrectCaptchaException" th:text="#{error.captchaIncorrect}"></span>
+                    <span th:case="UnknownAccountException" th:text="#{error.unknownAccount}"></span>
+                    <span th:case="IncorrectCredentialsException" th:text="#{error.incorrectPassword}"></span>
+                    <span th:case="LockedAccountException" th:text="#{error.lockedAccount}"></span>
+                    <span th:case="*" th:text="${shiroLoginFailure}"></span>
+                </th:block>
+            </div>
+            <div class="reg-box-body rounded p-4 mt-4" style="background-color:#fff;border:1px solid #ccc;">
+                <form class="mb-2" id="validForm" th:action="@{/sign_in}" method="POST">
+                    <div class="form-group">
+                        <label class="sr-only" for="username" th:text="#{user.username}"></label>
+                        <input type="text" class="form-control" id="username" name="username" th:value="${username}" th:placeholder="#{user.username}" th:title="#{user.username.required}" required>
+                        <!--<small class="form-text text-muted">4~18个字符，可使用字母、数字、下划线</small>-->
+                    </div>
+                    <div class="form-group">
+                        <label class="sr-only" for="password" th:text="password"></label>
+                        <input type="password" class="form-control" id="password" name="password" th:placeholder="#{user.password}" th:title="#{user.password.required}" required autocomplete="off">
+                    </div>
+                    <div class="form-group" th:if="${session.shiroCaptchaRequired?:false || configs.restrict.passwordRetryMax <= 0}">
+                        <label class="sr-only" for="captcha" th:text="#{captcha}"></label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="captcha" name="captcha" onfocus="fetchCaptcha()" th:placeholder="#{captcha}" autocomplete="off" required th:title="#{enterCaptcha}"
+                                   th:data-msg-remote="#{incorrectCaptcha}">
+                            <div class="input-group-append">
+                                <img id="captchaImg" class="input-group-text" style="cursor:pointer;padding:0;" onclick="fetchCaptcha()" th:title="#{clickToRetrieveCaptcha}"
+                                     src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7">
+                                <input type="hidden" id="captchaToken" name="captchaToken">
+                                <script th:inline="javascript">
+                                    function fetchCaptcha() {
+                                        request(/*[[@{/api/captcha}]]*/'', {}).then(function (data) {
+                                            if (data === null) return;
+                                            $('#captchaImg').attr('src', 'data:image/png;base64,' + data.base64);
+                                            $('#captchaToken').val(data.token);
+                                        });
+                                    }
+                                </script>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="rememberMe" name="rememberMe" checked>
+                        <label class="custom-control-label" for="rememberMe" th:text="#{rememberMe}"></label>
+                    </div>
+                    <input type="hidden" name="fallbackUrl" th:value="${param.fallbackUrl}"/>
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                    <button type="submit" class="btn btn-primary btn-block" th:text="#{signIn}"></button>
+                </form>
+                <p class="text-center text-muted pt-2">
+                    <small>----- OR -----</small>
+                </p>
+                <p th:fragment="oauth_sign_in" class="text-center lead">
+                    <!-- style="background-color:#e32529;"-->
+                    <a href="#" th:href="@{/oauth/sign_in/weibo(fallbackUrl=${param.fallbackUrl})}" class="text-light"><i class="fab fa-weibo rounded-circle p-2 bg-danger"></i></a>
+                    <!-- style="background-color:#0076c4;"-->
+                    <a href="#" th:href="@{/oauth/sign_in/qq(fallbackUrl=${param.fallbackUrl})}" class="text-light"><i class="fab fa-qq rounded-circle p-2 bg-primary"></i></a>
+                    <!-- style="background-color:#00bc0c;"-->
+                    <a href="#" th:href="@{/oauth/sign_in/weixin(fallbackUrl=${param.fallbackUrl})}" class="text-light"><i class="fab fa-weixin rounded-circle p-2 bg-success"></i></a>
+                </p>
+                <p class="text-center">
+                    <small><a href="sign_up.html" th:href="@{/sign_up}" th:text="#{signUp}"></a><a class="ml-3" href="password_reset.html" th:href="@{/password_reset}" th:text="#{forgetPassword}"></a></small>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    $(function () {
+        $("#username").focus().select();
+        $("#validForm").validate({
+            rules: {
+                captcha: {
+                    remote: {
+                        url: /*[[@{/api/try_captcha}]]*/'', data: {
+                            token: function () {
+                                return $('#captchaToken').val();
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
+<script th:replace="|${theme}/fragment/common| :: access_log"></script>
+</body>
+</html>

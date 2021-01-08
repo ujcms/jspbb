@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>[[${param.q}]] - [[#{search}]] - [[${configs.base.siteName}]]</title>
+    <meta name="keywords" th:content="${configs.base.siteKeywords}">
+    <meta name="description" th:content="${configs.base.siteDescription}">
+    <link th:replace="|${theme}/fragment/common| :: css">
+    <link th:replace="|${theme}/fragment/common| :: css_simplemde">
+    <script th:replace="|${theme}/fragment/common| :: js"></script>
+</head>
+<body>
+<div th:replace="|${theme}/fragment/show_error| :: show_error"></div>
+<div th:replace="|${theme}/fragment/common| :: browser_upgrade"></div>
+<header th:replace="|${theme}/fragment/common| :: header"></header>
+<div class="container mt-3" th:if="${!#strings.isEmpty(param.q)}" th:jspbb-questions="beans" th:with="title=${param.q}, markdown=${param.q}, Q_OrderBy='activeDate_desc', pageSise=15, pageable=true">
+    <h2 class="h4" th:text="#{search.results(${beans.total})}"></h2>
+    <ul class="list-group list-group-flush">
+        <li class="list-group-item px-0" th:each="bean:${beans}" th:object="${bean}">
+            <a th:href="@{/questions/{id}(id=*{id})}" th:text="*{ext.title}"></a>
+            <div class="small">
+                <span class="text-muted" th:text="*{#temporals.format(created,'yyyy-MM-dd HH:mm')}">"></span>
+                <a href="javascript:" class="ml-1" th:text="*{user.username}"></a>
+            </div>
+        </li>
+    </ul>
+    <nav class="mt-2" th:insert="|${theme}/fragment/pagination| :: pagination(${beans})"></nav>
+    <script th:inline="javascript" th:replace="|${theme}/fragment/pagination| :: adjust_page"></script>
+</div>
+<footer th:replace="|${theme}/fragment/common| :: footer"></footer>
+
+<script th:replace="|${theme}/fragment/common| :: js_simplemde"></script>
+<script th:replace="|${theme}/fragment/common| :: access_log"></script>
+<script>
+</script>
+</body>
+</html>

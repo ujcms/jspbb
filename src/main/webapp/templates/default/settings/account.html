@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>[[#{settings.account}]] - [[${configs.base.siteName}]]</title>
+    <meta name="keywords" th:content="${configs.base.siteKeywords}">
+    <meta name="description" th:content="${configs.base.siteDescription}">
+    <link th:replace="|${theme}/fragment/common| :: css">
+    <link th:replace="|${theme}/fragment/common| :: css_simplemde">
+    <script th:replace="|${theme}/fragment/common| :: js"></script>
+</head>
+<body>
+<div th:replace="|${theme}/fragment/show_error| :: show_error"></div>
+<div th:replace="|${theme}/fragment/common| :: browser_upgrade"></div>
+<header th:replace="|${theme}/fragment/common| :: header"></header>
+<div class="container mt-2">
+    <div class="row">
+        <div class="col-sm-3">
+            <div class="list-group mt-2" th:replace="|${theme}/settings/profile| :: left('account')"></div>
+        </div>
+        <div class="col-sm-9">
+            <h3 class="py-3 border-bottom" th:text="#{settings.account.changePassword}"></h3>
+            <form class="mt-3" id="passwordForm" th:action="@{/api/settings/password(_method=PUT)}" method="POST">
+                <!-- 如没有设置密码（通过 oauth 注册），则不显示输入旧密码 -->
+                <div class="form-group" th:if="${user.ext.hasPassword}">
+                    <label for="oldPassword" th:text="#{user.oldPassword}"></label>
+                    <input type="password" class="form-control" id="oldPassword" name="oldPassword" required>
+                </div>
+                <div class="form-group">
+                    <label for="newPassword" th:text="#{user.newPassword}"></label>
+                    <input type="password" class="form-control" id="newPassword" name="password" required>
+                </div>
+                <div class="form-group">
+                    <label for="confirmNewPassword" th:text="#{user.confirmNewPassword}"></label>
+                    <input type="password" class="form-control" id="confirmNewPassword" required data-rule-equalTo="#newPassword" th:data-msg-equalTo="#{validation.equalTo}">
+                </div>
+                <button type="submit" class="btn btn-primary" th:text="#{submit}"></button>
+            </form>
+            <h3 class="py-3 mt-3 border-bottom" th:text="#{settings.account.changeEmail}"></h3>
+            <form class="mt-3" id="emailForm" th:action="@{/api/settings/email(_method=PUT)}" method="POST">
+                <div class="form-group" th:if="${user.email != null}">
+                    <label for="oldEmail" th:text="#{user.oldEmail}"></label>
+                    <input type="text" class="form-control" id="oldEmail" name="oldEmail" th:value="${user.email}" readonly disabled>
+                </div>
+                <div class="form-group">
+                    <label for="newEmail" th:text="#{user.newEmail}"></label>
+                    <input type="text" class="form-control" id="newEmail" name="email" required th:title="#{user.email.required}"
+                           data-rule-email="true" th:data-msg-email="#{user.email.invalid}" th:data-rule-remote="@{/api/users/email_not_exist}" th:data-msg-remote="#{user.email.exist}">
+                </div>
+                <div class="form-group">
+                    <label for="emailMessage" th:text="#{emailMessage}"></label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="emailMessage" name="emailMessage" autocomplete="off" required th:title="#{enterEmailMessage}" th:data-msg-remote="#{incorrectEmailMessage}">
+                        <input type="hidden" id="emailMessageId" name="emailMessageId">
+                        <span class="input-group-append"><button class="btn btn-secondary" id="emailMessageButton" type="button" th:text="#{obtainEmailMessage}"></button></span>
+                    </div>
+                </div>
+                <!-- 如没有设置密码（通过 oauth 注册），则不显示输入旧密码 -->
+                <div class="form-group" th:if="${user.ext.hasPassword}">
+                    <label for="emailPassword" th:text="#{user.password}"></label>
+                    <input type="password" class="form-control" id="emailPassword" name="password" required>
+                </div>
+                <button type="submit" class="btn btn-primary" th:text="#{submit}"></button>
+            </form>
+            <h3 class="py-3 mt-3 border-bottom" th:text="#{settings.account.changeMobile}"></h3>
+            <form class="mt-3" id="mobileForm" th:action="@{/api/settings/mobile(_method=PUT)}" method="POST">
+                <div class="form-group" th:if="${user.mobile != null}">
+                    <label for="oldMobile" th:text="#{user.oldMobile}"></label>
+                    <input type="text" class="form-control" id="oldMobile" name="oldMobile" th:value="${user.mobile}" readonly disabled>
+                </div>
+                <div class="form-group">
+                    <label for="newMobile" th:text="#{user.newMobile}"></label>
+                    <input type="text" class="form-control" id="newMobile" name="mobile" required th:title="#{user.mobile.required}"
+                           data-rule-pattern="^1\d{10}$" th:data-msg-pattern="#{user.mobile.invalid}" th:data-rule-remote="@{/api/users/mobile_not_exist}" th:data-msg-remote="#{user.mobile.exist}">
+                </div>
+                <div th:fragment="mobileMessage" class="form-group">
+                    <label for="mobileMessage" th:text="#{mobileMessage}"></label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="mobileMessage" name="mobileMessage" autocomplete="off" required th:title="#{enterMobileMessage}"th:data-msg-remote="#{incorrectMobileMessage}">
+                        <input type="hidden" id="mobileMessageId" name="mobileMessageId">
+                        <span class="input-group-append"><button class="btn btn-secondary" id="mobileMessageButton" type="button" th:text="#{obtainMobileMessage}"></button></span>
+                    </div>
+                </div>
+                <!-- 如没有设置密码（通过 oauth 注册），则不显示输入旧密码 -->
+                <div class="form-group" th:if="${user.ext.hasPassword}">
+                    <label for="mobilePassword" th:text="#{user.password}"></label>
+                    <input type="password" class="form-control" id="mobilePassword" name="password" required>
+                </div>
+                <button type="submit" class="btn btn-primary" th:text="#{submit}"></button>
+            </form>
+        </div>
+    </div>
+</div>
+<footer th:replace="|${theme}/fragment/common| :: footer"></footer>
+<script th:replace="|${theme}/fragment/common| :: js_simplemde"></script>
+<!--<script th:src="@{/vendor/bootstrap-datepicker/dist/flatpickr.min.js}"></script>-->
+<script th:src="@{/vendor/flatpickr/dist/flatpickr.min.js}"></script>
+<script th:src="@{/vendor/flatpickr/dist/l10n/index.js}"></script>
+<div th:replace="|${theme}/fragment/send_sms| :: send_email_mmessage"></div>
+<div th:replace="|${theme}/fragment/send_sms| :: send_mobile_mmessage"></div>
+<script th:inline="javascript">
+    $(function () {
+        $('#passwordForm').validate({
+            submitHandler: function (form) {
+                request(form.action, {method: form.method, body: $(form).serializeJSON()}).then(function (data) {
+                    if (data === null) return;
+                    showSuccess();
+                    location.reload();
+                });
+            }
+        });
+        var emailFormValidator = $('#emailForm').validate({
+            rules: {
+                emailMessage: {
+                    remote: {
+                        url: /*[[@{/api/try_email_message}]]*/'', data: {
+                            emailMessageId: function () {
+                                return $('#emailMessageId').val();
+                            },
+                            email: function () {
+                                return $('#newEmail').val();
+                            }
+                        }
+                    }
+                }
+            },
+            submitHandler: function (form) {
+                request(form.action, {method: form.method, body: $(form).serializeJSON()}).then(function (data) {
+                    if (data === null) return;
+                    showSuccess();
+                    location.reload();
+                });
+            }
+        });
+        $('#emailMessageButton').click(function () {
+            sendEmailMessage(emailFormValidator, $('#newEmail'), $('#emailMessageId'), $(this), 'changeEmail');
+        });
+        var mobileFormValidator = $('#mobileForm').validate({
+            rules: {
+                mobileMessage: {
+                    remote: {
+                        url: /*[[@{/api/try_mobile_message}]]*/'', data: {
+                            mobileMessageId: function () {
+                                return $('#mobileMessageId').val();
+                            },
+                            mobile: function () {
+                                return $('#newMobile').val();
+                            }
+                        }
+                    }
+                }
+            },
+            submitHandler: function (form) {
+                request(form.action, {method: form.method, body: $(form).serializeJSON()}).then(function (data) {
+                    if (data === null) return;
+                    showSuccess();
+                    location.reload();
+                });
+            }
+        });
+        $('#mobileMessageButton').click(function () {
+            sendMobileMessage(mobileFormValidator, $('#newMobile'), $('#mobileMessageId'), $(this), 'changeMobile');
+        });
+    });
+</script>
+<script th:replace="|${theme}/fragment/common| :: access_log"></script>
+</body>
+</html>

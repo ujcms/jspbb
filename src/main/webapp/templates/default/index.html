@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>[[${configs.base.siteName}]]</title>
+    <meta name="keywords" th:content="${configs.base.siteKeywords}">
+    <meta name="description" th:content="${configs.base.siteDescription}">
+    <link th:replace="|${theme}/fragment/common| :: css">
+    <link th:replace="|${theme}/fragment/common| :: css_simplemde">
+    <script th:replace="|${theme}/fragment/common| :: js"></script>
+</head>
+<body>
+<div th:replace="|${theme}/fragment/show_error| :: show_error"></div>
+<div th:replace="|${theme}/fragment/common| :: browser_upgrade"></div>
+<header th:replace="|${theme}/fragment/common| :: header"></header>
+<div class="container mt-2">
+    <a href="questions_form.html" th:href="@{/questions/new}" class="btn btn-primary" role="button" aria-pressed="true" th:text="#{askQuestion}"></a>
+</div>
+<div class="container" th:jspbb-questions="beans" th:with="Q_OrderBy='activeDate_desc',pageSize=15, pageable=true">
+    <ul class="list-group list-group-flush">
+        <li class="list-group-item px-0 d-flex align-items-center" th:each="bean:${beans}" th:object="${bean}">
+            <div class="small text-muted d-flex text-center">
+                <div class="px-1 mr-1 border border-success text-success">
+                    <div th:text="*{answerCount}"></div>
+                    <div th:text="#{answers}"></div>
+                </div>
+                <div class="px-1 mr-1 border border-white d-none d-sm-inline">
+                    <div th:text="*{views}"></div>
+                    <div th:text="#{views}"></div>
+                </div>
+            </div>
+            <div class="pl-1">
+                <a th:href="@{/questions/{id}(id=*{id})}" th:text="*{ext.title}">问题标题</a>
+                <div class="small text-muted">
+                    <th:block th:switch="*{ext.activeType}">
+                        <span th:text="*{#jspbb.prettyTime(activeDate)}"></span>
+                        <span th:case="asked" th:text="#{asked}"></span>
+                        <span th:case="answered" th:text="#{answered}"></span>
+                        <span th:case="commented" th:text="#{commented}"></span>
+                        <span th:case="edited" th:text="#{edited}"></span>
+                        <span th:case="*"></span>
+                    </th:block>
+                    <!--/* [[${#temporals.format(bean.activeUser.ext.birthday,'yyyy-MM-dd HH:mm:ss')}]] */-->
+                    <a class="ml-1" href="javascript:" th:text="*{activeUser.username}"></a>
+                    <a class="text-muted ml-2" th:if="${user?.hasPerm('questionEdit',bean.userId)}" th:href="@{/questions/{id}/edit(id=${bean.id})}" th:text="#{edit}">编辑</a>
+                    <a class="text-muted ml-1" th:if="${user?.hasPerm('questionDelete')}" th:data-id="${bean.id}" onclick="deleteQuestion(this)" href="javascript:" th:text="#{delete}">删除</a>
+                </div>
+            </div>
+        </li>
+    </ul>
+    <div class="mt-2" th:insert="|${theme}/fragment/pagination| :: pagination(${beans})"></div>
+    <script th:replace="|${theme}/fragment/pagination| :: adjust_page"></script>
+</div>
+
+<footer th:replace="|${theme}/fragment/common| :: footer"></footer>
+<script th:replace="|${theme}/fragment/common| :: js_simplemde"></script>
+<script th:inline="javascript">
+    function deleteQuestion(element) {
+        $.confirm({
+            title: '', content: /*[[#{confirmDelete}]]*/'', buttons: {
+                confirm: {
+                    text: /*[[#{ok}]]*/'', btnClass: 'btn-blue', keys: ['enter'], action: function () {
+                        request(/*[[@{/api/questions(_method=DELETE)}]]*/'', {method: 'POST', body: [$(element).data("id")]}).then(function (data) {
+                            if (data === null) return;
+                            showSuccess();
+                            location.reload();
+                        });
+                    }
+                },
+                cancel: {text: /*[[#{cancel}]]*/''}
+            }
+        });
+        return false;
+    }
+</script>
+<script th:replace="|${theme}/fragment/common| :: access_log"></script>
+</body>
+</html>

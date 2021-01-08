@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jspbb.core.mapper.AccessMapper">
+    <resultMap id="BaseResultMap" type="com.jspbb.core.domain.Access">
+        <id column="id_" jdbcType="BIGINT" property="id"/>
+        <result column="user_id_" jdbcType="BIGINT" property="userId"/>
+        <result column="date_" jdbcType="TIMESTAMP" property="date"/>
+        <result column="date_ymd_" jdbcType="VARCHAR" property="dateYmd"/>
+        <result column="date_ymdh_" jdbcType="VARCHAR" property="dateYmdh"/>
+        <result column="date_ymdhi_" jdbcType="VARCHAR" property="dateYmdhi"/>
+        <result column="ip_" jdbcType="VARCHAR" property="ip"/>
+        <result column="cookie_" jdbcType="BIGINT" property="cookie"/>
+        <result column="source_" jdbcType="VARCHAR" property="source"/>
+        <result column="browser_" jdbcType="VARCHAR" property="browser"/>
+        <result column="os_" jdbcType="VARCHAR" property="os"/>
+        <result column="device_" jdbcType="CHAR" property="device"/>
+        <result column="country_" jdbcType="VARCHAR" property="country"/>
+        <result column="province_" jdbcType="VARCHAR" property="province"/>
+        <result column="city_" jdbcType="VARCHAR" property="city"/>
+        <result column="provider_" jdbcType="VARCHAR" property="provider"/>
+        <association property="ext" javaType="com.jspbb.core.domain.AccessExt" column="id_" select="com.jspbb.core.mapper.AccessExtMapper.select"/>
+        <association property="user" javaType="com.jspbb.core.domain.User" column="user_id_" select="com.jspbb.core.mapper.UserMapper.select"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id_, user_id_, date_, date_ymd_, date_ymdh_, date_ymdhi_, ip_, cookie_,
+        source_, browser_, os_, device_, country_, province_, city_, provider_
+    </sql>
+    <select id="select" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from jspbb_access
+        where id_ = #{id,jdbcType=BIGINT}
+    </select>
+    <delete id="delete" parameterType="java.lang.Long">
+        delete from jspbb_access
+        where id_ = #{id,jdbcType=BIGINT}
+    </delete>
+    <insert id="insert" parameterType="com.jspbb.core.domain.Access">
+        insert into jspbb_access (<include refid="Base_Column_List"/>)
+        values (#{id,jdbcType=BIGINT}, #{userId,jdbcType=BIGINT}, #{date,jdbcType=TIMESTAMP}, #{dateYmd,jdbcType=VARCHAR},
+        #{dateYmdh,jdbcType=VARCHAR}, #{dateYmdhi,jdbcType=VARCHAR}, #{ip,jdbcType=VARCHAR}, #{cookie,jdbcType=BIGINT},
+        #{source,jdbcType=VARCHAR}, #{browser,jdbcType=VARCHAR}, #{os,jdbcType=VARCHAR}, #{device,jdbcType=CHAR},
+        #{country,jdbcType=VARCHAR},#{province,jdbcType=VARCHAR}, #{city,jdbcType=VARCHAR}, #{provider,jdbcType=VARCHAR})
+    </insert>
+    <update id="update" parameterType="com.jspbb.core.domain.Access">
+        update jspbb_access
+        set user_id_    = #{userId,jdbcType=BIGINT},
+            date_       = #{date,jdbcType=TIMESTAMP},
+            date_ymd_   = #{dateYmd,jdbcType=VARCHAR},
+            date_ymdh_  = #{dateYmdh,jdbcType=VARCHAR},
+            date_ymdhi_ = #{dateYmdhi,jdbcType=VARCHAR},
+            ip_         = #{ip,jdbcType=VARCHAR},
+            cookie_     = #{cookie,jdbcType=BIGINT},
+            source_     = #{source,jdbcType=VARCHAR},
+            browser_    = #{browser,jdbcType=VARCHAR},
+            os_         = #{os,jdbcType=VARCHAR},
+            device_     = #{device,jdbcType=CHAR},
+            country_    = #{country,jdbcType=VARCHAR},
+            province_   = #{province,jdbcType=VARCHAR},
+            city_       = #{city,jdbcType=VARCHAR},
+            provider_   = #{provider,jdbcType=VARCHAR}
+        where id_ = #{id,jdbcType=BIGINT}
+    </update>
+    <select id="selectAll" resultMap="BaseResultMap">
+        <include refid="com.jspbb.core.mapper.SeqMapper.Select_All">
+            <property name="tableName" value="jspbb_access"/>
+        </include>
+    </select>
+
+    <update id="updateUserId">
+        update jspbb_access
+        set user_id_ = #{userId,jdbcType=BIGINT}
+        where user_id_ = #{origUserId,jdbcType=BIGINT}
+    </update>
+</mapper>

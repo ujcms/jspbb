@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ehcache updateCheck="false" name="shiroCache">
+	<diskStore path="java.io.tmpdir/jspbb/ehcache/shiro" />
+	<defaultCache maxEntriesLocalHeap="1000" eternal="false" timeToIdleSeconds="120" timeToLiveSeconds="120" overflowToDisk="false" />
+</ehcache>

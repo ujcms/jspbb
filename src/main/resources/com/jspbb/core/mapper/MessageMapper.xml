@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jspbb.core.mapper.MessageMapper">
+    <resultMap id="BaseResultMap" type="com.jspbb.core.domain.Message">
+        <id column="id_" jdbcType="BIGINT" property="id"/>
+        <result column="user_id_" jdbcType="BIGINT" property="userId"/>
+        <result column="contact_user_id_" jdbcType="BIGINT" property="contactUserId"/>
+        <result column="from_user_id_" jdbcType="BIGINT" property="fromUserId"/>
+        <result column="to_user_id_" jdbcType="BIGINT" property="toUserId"/>
+        <result column="messagedetail_id_" jdbcType="BIGINT" property="messageDetailId"/>
+        <result column="date_" jdbcType="TIMESTAMP" property="date"/>
+        <result column="sys_" jdbcType="BOOLEAN" property="sys"/>
+        <result column="type_" jdbcType="INTEGER" property="type"/>
+        <result column="unread_" jdbcType="BOOLEAN" property="unread"/>
+        <result column="send_total_" jdbcType="INTEGER" property="sendTotal"/>
+        <result column="read_count_" jdbcType="INTEGER" property="readCount"/>
+        <association property="user" javaType="com.jspbb.core.domain.User" column="user_id_" select="com.jspbb.core.mapper.UserMapper.select"/>
+        <association property="contactUser" javaType="com.jspbb.core.domain.User" column="contact_user_id_" select="com.jspbb.core.mapper.UserMapper.select"/>
+        <association property="fromUser" javaType="com.jspbb.core.domain.User" column="from_user_id_" select="com.jspbb.core.mapper.UserMapper.select"/>
+        <association property="toUser" javaType="com.jspbb.core.domain.User" column="to_user_id_" select="com.jspbb.core.mapper.UserMapper.select"/>
+        <association property="detail" javaType="com.jspbb.core.domain.MessageDetail" column="messagedetail_id_" select="com.jspbb.core.mapper.MessageDetailMapper.select"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id_, user_id_, contact_user_id_, from_user_id_, to_user_id_, messagedetail_id_, date_, sys_, type_, unread_, send_total_, read_count_
+    </sql>
+    <select id="select" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from jspbb_message
+        where id_ = #{id,jdbcType=BIGINT}
+    </select>
+    <delete id="delete" parameterType="java.lang.Long">
+        delete from jspbb_message
+        where id_ = #{id,jdbcType=BIGINT}
+    </delete>
+    <insert id="insert" parameterType="com.jspbb.core.domain.Message">
+        insert into jspbb_message (<include refid="Base_Column_List"/>)
+        values (#{id,jdbcType=BIGINT}, #{userId,jdbcType=BIGINT}, #{contactUserId,jdbcType=BIGINT}, #{fromUserId,jdbcType=BIGINT}, #{toUserId,jdbcType=BIGINT},
+        #{messageDetailId,jdbcType=BIGINT}, #{date,jdbcType=TIMESTAMP}, #{sys,jdbcType=BOOLEAN},#{type,jdbcType=INTEGER}, #{unread,jdbcType=BOOLEAN},
+        #{sendTotal,jdbcType=INTEGER}, #{readCount,jdbcType=INTEGER})
+    </insert>
+    <update id="update" parameterType="com.jspbb.core.domain.Message">
+        update jspbb_message
+        set user_id_          = #{userId,jdbcType=BIGINT},
+            contact_user_id_  = #{contactUserId,jdbcType=BIGINT},
+            from_user_id_     = #{fromUserId,jdbcType=BIGINT},
+            to_user_id_       = #{toUserId,jdbcType=BIGINT},
+            messagedetail_id_ = #{messageDetailId,jdbcType=BIGINT},
+            date_             = #{date,jdbcType=TIMESTAMP},
+            sys_              = #{sys,jdbcType=BOOLEAN},
+            type_             = #{type,jdbcType=INTEGER},
+            unread_           = #{read,jdbcType=BOOLEAN},
+            send_total_       = #{sendTotal,jdbcType=INTEGER},
+            read_count_       = #{readCount,jdbcType=INTEGER}
+        where id_ = #{id,jdbcType=BIGINT}
+    </update>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        <include refid="com.jspbb.core.mapper.SeqMapper.Select_All">
+            <property name="tableName" value="jspbb_message"/>
+        </include>
+    </select>
+
+    <delete id="deleteByIds">
+        DELETE FROM jspbb_message
+        WHERE id_ IN
+        <foreach collection="ids" item="id" separator="," open="(" close=")">${id}</foreach>
+    </delete>
+    <update id="readByContactUserId">
+        UPDATE jspbb_message
+        SET unread_ = 0
+        WHERE user_id_ = #{userId} AND contact_user_id_ = ${contactUserId}
+    </update>
+    <select id="selectByContactUserId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM jspbb_message
+        WHERE user_id_ = #{userId} AND contact_user_id_ = #{contactUserId}
+        ORDER BY date_ desc
+    </select>
+    <select id="groupByUserId" resultMap="BaseResultMap">
+        SELECT
+            MAX(t.id_)       id_,
+            MAX(t.user_id_)          user_id_,
+            t.contact_user_id_       contact_user_id_,
+            t.contact_user_id_       from_user_id_,
+            t.contact_user_id_       to_user_id_,
+            MAX(t.messagedetail_id_) messagedetail_id_,
+            MAX(t.date_)             date_,
+            MAX(t.sys_)              sys_,
+            MAX(t.unread_)           unread_,
+            SUM(t.unread_)           unreadCount,
+            COUNT(t.id_)     total
+        FROM jspbb_message t
+        WHERE t.user_id_ = #{userId}
+        GROUP BY t.contact_user_id_
+        ORDER BY date_ desc
+    </select>
+    <select id="countUnread" resultType="long">
+        SELECT COUNT(*)
+        FROM jspbb_message
+        WHERE user_id_ = #{userId} AND unread_ = 1
+    </select>
+</mapper>

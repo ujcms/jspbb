@@ -1,0 +1,16 @@
+# Eclipse project files
+.classpath
+.project
+/.settings
+
+# Intellij project files
+*.iml
+/.idea
+
+# js
+/node_modules
+package-lock.json
+
+# Others
+/target
+/logs

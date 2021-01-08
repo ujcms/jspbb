@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>[[#{settings.picture}]] - [[${configs.base.siteName}]]</title>
+    <meta name="keywords" th:content="${configs.base.siteKeywords}">
+    <meta name="description" th:content="${configs.base.siteDescription}">
+    <link th:replace="|${theme}/fragment/common| :: css">
+    <link th:replace="|${theme}/fragment/common| :: css_simplemde">
+    <link rel="stylesheet" th:href="@{/vendor/blueimp-file-upload/css/jquery.fileupload.css}">
+    <link rel="stylesheet" th:href="@{/vendor/cropperjs/dist/cropper.min.css}">
+    <script th:replace="|${theme}/fragment/common| :: js"></script>
+    <style>
+        /* Limit image width to avoid overflow the container */
+        img {
+            max-width: 100%; /* This rule is very important, please do not ignore this! */
+        }
+    </style>
+    <script th:replace="|${theme}/fragment/common| :: js"></script>
+</head>
+<body>
+<div th:replace="|${theme}/fragment/show_error| :: show_error"></div>
+<div th:replace="|${theme}/fragment/common| :: browser_upgrade"></div>
+<header th:replace="|${theme}/fragment/common| :: header"></header>
+<div class="container mt-2">
+    <div class="row">
+        <div class="col-sm-3">
+            <div class="list-group mt-2" th:replace="|${theme}/settings/profile| :: left('picture')"></div>
+        </div>
+        <div class="col-sm-9">
+            <h3 class="py-3 border-bottom" th:text="#{settings.picture}"></h3>
+            <div class="mt-3" style="max-height: 900px;">
+                <img th:src="@{${user.ext.pictureUrlMedium}}" class="rounded" style="width:180px;height:180px;">
+            </div>
+            <div class="mt-3">
+                <span class="btn btn-success fileinput-button">
+                    <i class="fas fa-plus"></i>
+                    <span th:text="#{uploadProfilePicture}"></span>
+                    <input id="fileupload" type="file" name="file" th:accept="${configs.upload.imageAccept}">
+                </span>
+                <div id="progress" class="progress mt-2" style="display:none;">
+                    <div class="progress-bar progress-bar-success"></div>
+                </div>
+                <div id="progressfail" class="invalid-feedback"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="pictureModel" class="modal fade bd-example-modal-lg" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <div class="modal-body">
+                <div id="imageDiv" class="mt-2"></div>
+                <div class="clearfix mt-2">
+                    <div class="image-preview float-left border" style="width:160px;height:160px;overflow: hidden;"></div>
+                    <div class="image-preview float-left border ml-2 rounded-circle" style="width:80px;height:80px;overflow: hidden;"></div>
+                    <form class="float-right pt-2" id="validForm" th:action="@{/api/settings/picture(_method=PUT)}" method="POST">
+                        <input type="hidden" id="url" name="url">
+                        <input type="hidden" id="x" name="x">
+                        <input type="hidden" id="y" name="y">
+                        <input type="hidden" id="width" name="width">
+                        <input type="hidden" id="height" name="height">
+                        <button type="submit" class="btn btn-primary" th:text="#{submit}"></button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<footer th:replace="|${theme}/fragment/common| :: footer"></footer>
+<script th:replace="|${theme}/fragment/common| :: js_simplemde"></script>
+<script th:src="@{/vendor/blueimp-file-upload/js/vendor/jquery.ui.widget.min.js}"></script>
+<script th:src="@{/vendor/blueimp-file-upload/js/jquery.iframe-transport.min.js}"></script>
+<script th:src="@{/vendor/blueimp-file-upload/js/jquery.fileupload.min.js}"></script>
+<script th:src="@{/vendor/blueimp-file-upload/js/jquery.fileupload-process.min.js}"></script>
+<script th:src="@{/vendor/blueimp-file-upload/js/jquery.fileupload-validate.min.js}"></script>
+<script th:src="@{/vendor/cropperjs/dist/cropper.min.js}"></script>
+<script th:src="@{/vendor/jquery-cropper/dist/jquery-cropper.min.js}"></script>
+<script th:inline="javascript">
+    $(function () {
+        $('#validForm').validate({
+            submitHandler: function (form) {
+                request(form.action, {method: form.method, body: $(form).serializeJSON()}).then(function (data) {
+                    if (data === null) return;
+                    showSuccess();
+                    setTimeout(function () {
+                        location.reload();
+                    },1000);
+                });
+            }
+        });
+        $('#fileupload').fileupload({
+            url: /*[[@{/api/upload_image}]]*/'',
+            dataType: 'json',
+            maxFileSize: /*[[${configs.upload.imageLimitByte}]]*/ null,
+            acceptFileTypes: new RegExp(/*[[${configs.upload.imageTypeRegex}]]*/'', 'i'),
+            done: function (e, data) {
+                if (data.result.fileUrl) {
+                    // 上传成功后立即显示图片会出现图片不存在的问题，可能上传后服务器需要一个反应时间，经测试至少要延迟1000毫秒才能确保正确显示图片。
+                    setTimeout(function () {
+                        $('#imageDiv').append($('<img>').attr('id', 'image').attr('src', data.result.fileUrl));
+                        $('#url').val(data.result.fileUrl);
+                        $('#image').cropper({
+                            aspectRatio: 1 / 1,
+                            autoCropArea: 1,
+                            viewMode: 2,
+                            minCropBoxWidth:10,
+                            minCropBoxHeight:10,
+                            zoomable: false,
+                            preview: '.image-preview',
+                            crop: function (event) {
+                                $('#x').val(Math.floor(event.detail.x));
+                                $('#y').val(Math.floor(event.detail.y));
+                                $('#width').val(Math.floor(event.detail.width));
+                                $('#height').val(Math.floor(event.detail.height));
+                            }
+                        });
+                    }, 1000);
+                    // 要在显示图片前显示对话框，否则会出现图片大小无法计算的问题。为了让显示对话框和显示图片更好的衔接，延迟500毫秒显示对话框。
+                    setTimeout(function () {
+                        $('#pictureModel').modal('show');
+                        $('#imageDiv').empty();
+                    },500);
+                } else {
+                    showError(data.result.message);
+                }
+            },
+            fail: function (e, data) {
+                showErrorPre(data.jqXHR);
+            },
+            start: function (e) {
+                $('#progressfail').text('').hide();
+                $('#progress').show();
+                $('#progress .progress-bar').css('width', '0%');
+            },
+            always: function (e) {
+                setTimeout(function () {
+                    $('#progress').hide('fast');
+                    $('#progress .progress-bar').css('width', '0%');
+                }, 1000);
+            },
+            progress: function (e, data) {
+                var progress = Math.floor(data.loaded / data.total * 100);
+                $('#progress .progress-bar').css('width', progress + '%');
+            },
+            processfail: function (e, data) {
+                var file = data.files[data.index];
+                if (data.files.error && file.error) {
+                    $('#progressfail').text(file.error).show();
+                }
+            },
+            messages: {
+                acceptFileTypes: /*[[#{fileUpload.acceptFileTypes}]]*/'',
+                maxFileSize: /*[[#{fileUpload.maxFileSize}]]*/''
+            }
+        }).prop('disabled', !$.support.fileInput).parent().addClass($.support.fileInput ? undefined : 'disabled');
+    });
+</script>
+<script th:replace="|${theme}/fragment/common| :: access_log"></script>
+</body>
+</html>
