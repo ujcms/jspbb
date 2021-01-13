@@ -1,5 +1,6 @@
 package com.jspbb.core.service
 
+import com.jspbb.util.sensitive.Hit
 import com.jspbb.util.sensitive.SensitiveFilter
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.IOUtils
@@ -30,6 +31,8 @@ class SensitiveService(
     private var sensitiveWordsFile: File? = null
 
     fun matches(text: String?): Boolean = sensitiveFilter.finds(text, false).size > 0
+
+    fun finds(text: String?): MutableList<Hit> = sensitiveFilter.finds(text, false)
 
     fun filter(text: String?): String? = sensitiveFilter.filter(text)
 

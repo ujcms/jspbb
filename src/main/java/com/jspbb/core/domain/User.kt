@@ -60,6 +60,10 @@ open class User(
     @JsonIgnore
     fun hasPerm(perm: String) = id == 1L || group.hasPerm(perm)
 
+    /** 是否在禁止时间内 */
+    @JsonIgnore
+    fun inForbiddenTime() = !group.isTrusted && getConfigs().restrict.inForbiddenTime()
+
     /** 登录错误次数 */
     @JsonIgnore
     fun getLoginErrorCount(): Long = getRestrict(RESTRICT_LOGIN_ERROR)?.count ?: 0

@@ -16,6 +16,8 @@ open class QuestionExt(
         var markdown: String? = null,
         /** 正文 */
         var text: String? = null,
+        /** 匹配到的敏感词 */
+        var sensitiveWords: String? = null,
         /** 活跃类型 */
         var activeType: String = ACTIVE_ASKED,
         /** 修改次数 */

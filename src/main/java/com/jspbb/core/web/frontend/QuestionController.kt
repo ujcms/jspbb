@@ -1,10 +1,7 @@
 package com.jspbb.core.web.frontend
 
-import com.jspbb.core.domain.Group
-import com.jspbb.core.service.AnswerService
-import com.jspbb.core.service.ConfigService
-import com.jspbb.core.service.QuestionService
-import com.jspbb.core.service.UserService
+import com.jspbb.core.domain.*
+import com.jspbb.core.service.*
 import com.jspbb.core.support.Contexts
 import com.jspbb.core.support.Responses
 import org.springframework.mobile.device.DeviceResolver
@@ -17,6 +14,7 @@ import javax.servlet.http.HttpServletResponse
 
 @Controller
 class QuestionController(
+        private val notificationService: NotificationService,
         private val userService: UserService,
         private val answerService: AnswerService,
         private val service: QuestionService,
@@ -26,10 +24,18 @@ class QuestionController(
     @GetMapping("/questions/{id}")
     fun showQuestion(@PathVariable id: Long, request: HttpServletRequest, response: HttpServletResponse, modelMap: Model): String? {
         val question = service.select(id) ?: return Responses.notFound(response, "Question not found: $id")
-        if(!question.isNormal()) return Responses.notFound(response, "Question status not normal: $id")
+        if (!question.isNormal()) return Responses.notFound(response, "Question status not normal: $id")
         question.views++
         service.update(question, question.ext)
         modelMap.addAttribute("question", question)
+        // 删除通知
+        Contexts.getUsername()?.let { username ->
+            userService.selectByUsername(username)?.let { user ->
+                // data 都使用question.id，可以一起删除
+                val types = arrayOf(Question.NOTIFICATION_TYPE, Question.NOTIFICATION_UPDATE_TYPE, Answer.NOTIFICATION_TYPE, Answer.NOTIFICATION_UPDATE_TYPE, Comment.NOTIFICATION_TYPE, Comment.NOTIFICATION_UPDATE_TYPE)
+                notificationService.deleteByTypesAndData(user.id, types, question.id.toString())
+            }
+        }
         val configs = configService.selectConfigs()
         val theme = configs.getTheme(request, deviceResolver)
         return "$theme/questions_show"
@@ -44,6 +50,14 @@ class QuestionController(
         service.update(question, question.ext)
         modelMap.addAttribute("question", question)
         modelMap.addAttribute("answer", answer)
+        // 删除通知
+        Contexts.getUsername()?.let { username ->
+            userService.selectByUsername(username)?.let { user ->
+                // data 都使用question.id，可以一起删除
+                val types = arrayOf(Question.NOTIFICATION_TYPE, Question.NOTIFICATION_UPDATE_TYPE, Answer.NOTIFICATION_TYPE, Answer.NOTIFICATION_UPDATE_TYPE, Comment.NOTIFICATION_TYPE, Comment.NOTIFICATION_UPDATE_TYPE)
+                notificationService.deleteByTypesAndData(user.id, types, question.id.toString())
+            }
+        }
         val configs = configService.selectConfigs()
         val theme = configs.getTheme(request, deviceResolver)
         return "$theme/questions_show"

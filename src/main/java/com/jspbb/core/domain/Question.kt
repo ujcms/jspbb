@@ -1,5 +1,6 @@
 package com.jspbb.core.domain
 
+import org.springframework.web.util.UriTemplate
 import java.time.OffsetDateTime
 
 /**
@@ -51,13 +52,29 @@ open class Question(
 
         /** 类型名称。如附件类型、评论类型 */
         const val TYPE_NAME = "question"
+
+        /** 通知类型：新的提问 */
+        const val NOTIFICATION_TYPE = "question"
+
+        /** 通知类型：提问更新 */
+        const val NOTIFICATION_UPDATE_TYPE = "questionUpdate"
+
+
         /** 状态：正常 */
         const val STATUS_NORMAL = 0
+
         /** 状态：待审 */
         const val STATUS_PENDING = 1
+
         /** 状态：屏蔽 */
         const val STATUS_SHIELDED = 2
+
         /** 状态：删除 */
         const val STATUS_DELETED = 3
+
+        /** 问题URL地址 */
+        const val QUESTION_URL = "/questions/{id}"
+
+        fun getUrl(id: Long): String = UriTemplate(QUESTION_URL).expand(id).toString()
     }
 }

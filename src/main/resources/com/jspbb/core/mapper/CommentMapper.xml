@@ -12,6 +12,7 @@
         <result column="edit_date_" jdbcType="TIMESTAMP" property="editDate"/>
         <result column="markdown_" jdbcType="CLOB" property="markdown"/>
         <result column="text_" jdbcType="CLOB" property="text"/>
+        <result column="sensitive_words_" jdbcType="VARCHAR" property="sensitiveWords"/>
         <result column="status_" jdbcType="INTEGER" property="status"/>
         <result column="ip_" jdbcType="VARCHAR" property="ip"/>
         <result column="ip_country_" jdbcType="VARCHAR" property="ipCountry"/>
@@ -21,7 +22,7 @@
         <association property="editUser" javaType="com.jspbb.core.domain.User" column="edit_user_id_" select="com.jspbb.core.mapper.UserMapper.select"/>
     </resultMap>
     <sql id="Base_Column_List">
-        id_, parent_id_, user_id_, edit_user_id_, ref_type_, ref_id_, created_, edit_date_, markdown_, text_, status_, ip_, ip_country_, ip_province_, ip_city_
+        id_, parent_id_, user_id_, edit_user_id_, ref_type_, ref_id_, created_, edit_date_, markdown_, text_, sensitive_words_, status_, ip_, ip_country_, ip_province_, ip_city_
     </sql>
     <select id="select" parameterType="java.lang.Long" resultMap="BaseResultMap">
         select
@@ -36,26 +37,27 @@
     </delete>
     <insert id="insert" parameterType="com.jspbb.core.domain.Comment">
         insert into jspbb_comment (<include refid="Base_Column_List"/>)
-        values (#{id,jdbcType=BIGINT}, #{parentId,jdbcType=BIGINT}, #{userId,jdbcType=BIGINT}, #{editUserId,jdbcType=BIGINT},
-        #{refType,jdbcType=VARCHAR}, #{refId,jdbcType=BIGINT}, #{created,jdbcType=TIMESTAMP}, #{editDate,jdbcType=TIMESTAMP}, #{markdown,jdbcType=LONGVARCHAR}, #{text,jdbcType=LONGVARCHAR},
+        values (#{id,jdbcType=BIGINT}, #{parentId,jdbcType=BIGINT}, #{userId,jdbcType=BIGINT}, #{editUserId,jdbcType=BIGINT}, #{refType,jdbcType=VARCHAR}, #{refId,jdbcType=BIGINT},
+        #{created,jdbcType=TIMESTAMP}, #{editDate,jdbcType=TIMESTAMP}, #{markdown,jdbcType=CLOB}, #{text,jdbcType=CLOB},#{sensitiveWords,jdbcType=VARCHAR},
         #{status,jdbcType=INTEGER}, #{ip,jdbcType=VARCHAR}, #{ipCountry,jdbcType=VARCHAR}, #{ipProvince,jdbcType=VARCHAR}, #{ipCity,jdbcType=VARCHAR})
     </insert>
     <update id="update" parameterType="com.jspbb.core.domain.Comment">
         update jspbb_comment
-        set parent_id_    = #{parentId,jdbcType=BIGINT},
-            user_id_      = #{userId,jdbcType=BIGINT},
-            edit_user_id_ = #{editUserId,jdbcType=BIGINT},
-            ref_type_     = #{refType,jdbcType=VARCHAR},
-            ref_id_       = #{refId,jdbcType=BIGINT},
-            created_      = #{created,jdbcType=TIMESTAMP},
-            edit_date_    = #{editDate,jdbcType=TIMESTAMP},
-            markdown_     = #{markdown,jdbcType=LONGVARCHAR},
-            text_         = #{text,jdbcType=LONGVARCHAR},
-            status_       = #{status,jdbcType=INTEGER},
-            ip_           = #{ip,jdbcType=VARCHAR},
-            ip_country_   = #{ipCountry,jdbcType=VARCHAR},
-            ip_province_  = #{ipProvince,jdbcType=VARCHAR},
-            ip_city_      = #{ipCity,jdbcType=VARCHAR}
+        set parent_id_       = #{parentId,jdbcType=BIGINT},
+            user_id_         = #{userId,jdbcType=BIGINT},
+            edit_user_id_    = #{editUserId,jdbcType=BIGINT},
+            ref_type_        = #{refType,jdbcType=VARCHAR},
+            ref_id_          = #{refId,jdbcType=BIGINT},
+            created_         = #{created,jdbcType=TIMESTAMP},
+            edit_date_       = #{editDate,jdbcType=TIMESTAMP},
+            markdown_        = #{markdown,jdbcType=CLOB},
+            text_            = #{text,jdbcType=CLOB},
+            sensitive_words_ = #{sensitiveWords,jdbcType=VARCHAR},
+            status_          = #{status,jdbcType=INTEGER},
+            ip_              = #{ip,jdbcType=VARCHAR},
+            ip_country_      = #{ipCountry,jdbcType=VARCHAR},
+            ip_province_     = #{ipProvince,jdbcType=VARCHAR},
+            ip_city_         = #{ipCity,jdbcType=VARCHAR}
         where id_ = #{id,jdbcType=BIGINT}
     </update>
 

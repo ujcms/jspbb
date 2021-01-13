@@ -4,15 +4,16 @@ public class Hit {
     private int begin;
     private int end;
     private String value;
-
+    private String word;
 
     public Hit() {
     }
 
-    public Hit(int begin, int end, String value) {
+    public Hit(int begin, int end, String value, String word) {
         this.begin = begin;
         this.end = end;
         this.value = value;
+        this.word = word;
     }
 
     public int getBegin() {
@@ -21,6 +22,10 @@ public class Hit {
 
     public void setBegin(int begin) {
         this.begin = begin;
+    }
+
+    public int getLength() {
+        return this.end - this.begin;
     }
 
     public int getEnd() {
@@ -39,8 +44,16 @@ public class Hit {
         this.value = value;
     }
 
+    public String getWord() {
+        return word;
+    }
+
+    public void setWord(String word) {
+        this.word = word;
+    }
+
     @Override
     public String toString() {
-        return "[" + begin + "," + end + "]'" + value + "'";
+        return "[" + begin + "," + end + "]'" + value + "':'" + word + "'";
     }
 }

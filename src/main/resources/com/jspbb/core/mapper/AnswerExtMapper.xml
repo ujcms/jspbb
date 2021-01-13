@@ -5,6 +5,7 @@
         <id column="id_" jdbcType="BIGINT" property="id"/>
         <result column="markdown_" jdbcType="CLOB" property="markdown"/>
         <result column="text_" jdbcType="CLOB" property="text"/>
+        <result column="sensitive_words_" jdbcType="VARCHAR" property="sensitiveWords"/>
         <result column="ip_" jdbcType="VARCHAR" property="ip"/>
         <result column="ip_country_" jdbcType="VARCHAR" property="ipCountry"/>
         <result column="ip_province_" jdbcType="VARCHAR" property="ipProvince"/>
@@ -12,7 +13,7 @@
         <result column="edit_count_" jdbcType="INTEGER" property="editCount"/>
     </resultMap>
     <sql id="Base_Column_List">
-        id_, markdown_, text_, ip_, ip_country_, ip_province_, ip_city_, edit_count_
+        id_, markdown_, text_, sensitive_words_, ip_, ip_country_, ip_province_, ip_city_, edit_count_
     </sql>
     <select id="select" parameterType="java.lang.Long" resultMap="BaseResultMap">
         select
@@ -27,18 +28,19 @@
     </delete>
     <insert id="insert" parameterType="com.jspbb.core.domain.AnswerExt">
         insert into jspbb_answer_ext (<include refid="Base_Column_List"/>)
-        values (#{id,jdbcType=BIGINT}, #{markdown,jdbcType=CLOB}, #{text,jdbcType=CLOB}, #{ip,jdbcType=VARCHAR},
+        values (#{id,jdbcType=BIGINT}, #{markdown,jdbcType=CLOB}, #{text,jdbcType=CLOB},#{sensitiveWords,jdbcType=VARCHAR}, #{ip,jdbcType=VARCHAR},
         #{ipCountry,jdbcType=VARCHAR},#{ipProvince,jdbcType=VARCHAR}, #{ipCity,jdbcType=VARCHAR}, #{editCount,jdbcType=INTEGER} )
     </insert>
     <update id="update" parameterType="com.jspbb.core.domain.AnswerExt">
         update jspbb_answer_ext
-        set markdown_    = #{markdown,jdbcType=CLOB},
-            text_        = #{text,jdbcType=CLOB},
-            ip_          = #{ip,jdbcType=VARCHAR},
-            ip_country_  = #{ipCountry,jdbcType=VARCHAR},
-            ip_province_ = #{ipProvince,jdbcType=VARCHAR},
-            ip_city_     = #{ipCity,jdbcType=VARCHAR},
-            edit_count_  = #{editCount,jdbcType=INTEGER}
+        set markdown_        = #{markdown,jdbcType=CLOB},
+            text_            = #{text,jdbcType=CLOB},
+            sensitive_words_ = #{sensitiveWords,jdbcType=VARCHAR},
+            ip_              = #{ip,jdbcType=VARCHAR},
+            ip_country_      = #{ipCountry,jdbcType=VARCHAR},
+            ip_province_     = #{ipProvince,jdbcType=VARCHAR},
+            ip_city_         = #{ipCity,jdbcType=VARCHAR},
+            edit_count_      = #{editCount,jdbcType=INTEGER}
         where id_ = #{id,jdbcType=BIGINT}
     </update>
 </mapper>

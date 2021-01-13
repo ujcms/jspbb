@@ -21,13 +21,13 @@
         where id_ = #{id,jdbcType=BIGINT}
     </select>
     <delete id="delete" parameterType="java.lang.Long">
-        delete from jspbb_notification
+        delete
+        from jspbb_notification
         where id_ = #{id,jdbcType=BIGINT}
     </delete>
     <insert id="insert" parameterType="com.jspbb.core.domain.Notification">
         insert into jspbb_notification (<include refid="Base_Column_List"/>)
-        values (#{id,jdbcType=BIGINT}, #{userId,jdbcType=BIGINT}, #{type,jdbcType=VARCHAR},#{data,jdbcType=VARCHAR},
-        #{created,jdbcType=TIMESTAMP}, #{body,jdbcType=VARCHAR}, #{url,jdbcType=VARCHAR})
+        values (#{id,jdbcType=BIGINT}, #{userId,jdbcType=BIGINT}, #{type,jdbcType=VARCHAR},#{data,jdbcType=VARCHAR}, #{created,jdbcType=TIMESTAMP}, #{body,jdbcType=VARCHAR}, #{url,jdbcType=VARCHAR})
     </insert>
     <update id="update" parameterType="com.jspbb.core.domain.Notification">
         update jspbb_notification
@@ -47,8 +47,24 @@
     </select>
 
     <delete id="deleteByTypeAndData">
-        DELETE FROM jspbb_notification
-        WHERE user_id_ = #{userId} AND type_ = #{type} AND data_ = #{data}
+        DELETE
+        FROM jspbb_notification
+        WHERE user_id_ = #{userId}
+          AND type_ = #{type}
+          AND data_ = #{data}
+    </delete>
+    <delete id="deleteByTypesAndData">
+        DELETE
+        FROM jspbb_notification
+        WHERE user_id_ = #{userId}
+        AND type_ IN
+        <foreach collection="types" item="type" open="(" close=")" separator=",">#{type}</foreach>
+        AND data_ = #{data}
+    </delete>
+    <delete id="deleteByUserId">
+        DELETE
+        FROM jspbb_notification
+        WHERE user_id_ = #{userId}
     </delete>
     <select id="countByUserId" resultType="long">
         SELECT COUNT(*)

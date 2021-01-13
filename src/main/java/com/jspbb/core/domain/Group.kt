@@ -43,14 +43,21 @@ open class Group(
         var isTrusted: Boolean = true) {
     /** 上传每用户最大尺寸（Byte） */
     fun getUploadMaxByte(): Long = uploadMax * 1024L * 1024L
+    fun getPermList(): List<String> = perms?.split(',') ?: emptyList()
+    fun setPermList(permList: List<String>) {
+        perms = permList.joinToString(",")
+    }
 
     /** 是否有某个权限 */
     @JsonIgnore
-    fun hasPerm(perm: String): Boolean = perms?.split(";")?.any { it == perm } ?: false
+    fun hasPerm(perm: String): Boolean = getPermList().contains(perm)
 
     companion object {
         /** 默认用户组 */
         const val DEFAULT_GROUP_ID = 10L
+
+        /** 管理员用户组 */
+        const val ADMIN_GROUP_ID = 1L
 
         /** 类型：预设 */
         const val TYPE_PREDEFINED = 0

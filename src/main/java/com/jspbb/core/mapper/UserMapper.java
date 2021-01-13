@@ -37,6 +37,9 @@ public interface UserMapper {
     @Nullable
     User selectByEmail(@NotNull String email);
 
+    @NotNull
+    List<User> selectByGroupId(@NotNull Long groupId);
+
     @Nullable
     User selectByHome(@NotNull String home);
 

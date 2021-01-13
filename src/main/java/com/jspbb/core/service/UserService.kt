@@ -197,6 +197,7 @@ class UserService(
     fun selectByUsername(username: String): User? = mapper.selectByUsername(username)
     fun selectByMobile(mobile: String): User? = mapper.selectByMobile(mobile)
     fun selectByEmail(email: String): User? = mapper.selectByEmail(email)
+    fun selectByGroupId(groupId: Long): List<User> = mapper.selectByGroupId(groupId)
     fun selectByHome(home: String): User? = mapper.selectByHome(home)
 
     fun selectByOpenid(provider: String, openid: String): User? = mapper.selectByOpenid(provider, openid)

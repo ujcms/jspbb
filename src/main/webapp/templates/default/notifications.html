@@ -19,10 +19,11 @@
             <div class="clearfix py-2 border-bottom">
                 <h3 class="float-left" th:text="#{notifications}"></h3>
             </div>
-            <div th:jspbb-notifications="beans" th:with="userId=${user.id},pageSize=15, pageable=true">
+            <div th:jspbb-notifications="beans" th:with="userId=${user.id},pageSize=15,pageable=true">
                 <ul class="list-group list-group-flush">
-                    <li class="list-group-item px-0" th:each="bean:${beans}" th:object="${bean}" th:with="notificationType='notification.type.'+${bean.type}">
-                        <span th:text="#{${notificationType}}"></span> <span th:text="${bean.body}"></span>
+                    <li class="list-group-item clearfix px-0" th:each="bean:${beans}" th:object="${bean}" th:with="notificationType='notification.type.'+${bean.type}">
+                        <div class="float-left">[<span th:text="#{${notificationType}}"></span>] <a th:href="@{${bean.url}}"><span th:text="${bean.body}"></span></a></div>
+                        <div class="float-right small"><a href="javascript:" onclick="deleteNotifications(this)" th:data-id="${bean.id}" th:text="#{delete}">删除</a></div>
                     </li>
                 </ul>
                 <nav class="mt-2" th:if="${beans.pages gt 1}" th:insert="|${theme}/fragment/pagination| :: pagination(${beans})"></nav>
@@ -32,6 +33,16 @@
         </div>
     </div>
 </div>
+
+<script th:inline="javascript">
+    function deleteNotifications(element) {
+        request(/*[[@{/api/notifications(_method=DELETE)}]]*/'', {method: 'POST', body: [$(element).data('id')]}).then(function (data) {
+            if (data === null) return;
+            showSuccess();
+            location.reload();
+        });
+    }
+</script>
 <footer th:replace="|${theme}/fragment/common| :: footer"></footer>
 <script th:replace="|${theme}/fragment/common| :: js_simplemde"></script>
 <script th:replace="|${theme}/fragment/common| :: access_log"></script>

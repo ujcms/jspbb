@@ -10,9 +10,11 @@ jspBB这个名字为了致敬phpBB，系统中并没有使用jsp。当初php、a
 
 实际开发中，Kotlin的空值安全处理，可以大大的增强代码安全性，不用随时随地考虑null值的问题；类似动态语言的语法糖，可以做到想怎样就怎样，代码量少。没有java开发时那种为什么不能这样、为什么不能那样的苦恼，一个简单的想法，需要多行代码才能实现。
 
-程序包下载地址：[http://www.jspxcms.com/download/](http://www.jspxcms.com/download/)
-
-官方论坛：[http://jspbb.jspxcms.com](http://jspbb.jspxcms.com)
+* 官网地址：[http://www.jspxcms.com](http://www.jspxcms.com)
+* 官方论坛：[http://jspbb.jspxcms.com](http://jspbb.jspxcms.com)
+* 程序包下载地址：[http://www.jspxcms.com/download/](http://www.jspxcms.com/download/)
+* github源码托管地址：[https://github.com/ujcms/jspbb](https://github.com/ujcms/jspbb)
+* gitee源码托管地址：[https://gitee.com/jspxcms/jspbb](https://gitee.com/jspxcms/jspbb)
 
 QQ交流群：626599871（Jspxcms交流群(三)）
 
@@ -20,7 +22,7 @@ QQ交流群：626599871（Jspxcms交流群(三)）
 
 注册(阿里短信,邮箱)、登录、找回密码、第三方登录(QQ,微信,微博)、第三方存储(腾讯云,七牛云,阿里云)、提问(修改,删除)、回答(修改,删除)、评论(修改,删除)、搜索、支持Markdown(贴图)、支持敏感词过滤。
 
-![](http://res.jspxcms.com/uploads/1/image/public/202101/20210107214742_3mrkomemla.png)
+![](https://res.jspxcms.com/uploads/1/image/public/202101/20210107214742_3mrkomemla.png)
 
 ## 后台功能
 
@@ -31,17 +33,17 @@ QQ交流群：626599871（Jspxcms交流群(三)）
 
 后台列表页面，支持任意字段搜索、排序，隐藏或显示。
 
-![](http://res.jspxcms.com/uploads/1/image/public/202101/20210107215006_ka47msn85q.png)
+![](https://res.jspxcms.com/uploads/1/image/public/202101/20210107215006_ka47msn85q.png)
 
 后台修改页面，支持上一条、下一条显示和编辑，不用列表页、编辑页来回切换。
 
-![](http://res.jspxcms.com/uploads/1/image/public/202101/20210107215149_lht4tlyj3s.png)
+![](https://res.jspxcms.com/uploads/1/image/public/202101/20210107215149_lht4tlyj3s.png)
 
 ## 环境要求
 
 * JDK8。
 * Servlet3.1或更高版本（如Tomcat8.5或更高版本）。
-* MySQL5.5或更高版本（如需使用MySQL5.0，可将mysql驱动版本替换为5.1.24）。[如何连接MySQL8数据库](http://www.jspxcms.com/documentation/487.html)
+* MySQL5.5或更高版本（如需使用MySQL5.0，可将mysql驱动版本替换为5.1.24）。[如何连接MySQL8数据库](https://www.jspxcms.com/documentation/487.html)
 * 浏览器：IE11、Edge、Firefox、Chrome。
 
 ## 技术栈
@@ -69,6 +71,8 @@ QQ交流群：626599871（Jspxcms交流群(三)）
 * 前台地址：http://localhost:8080
 * 默认用户名：admin，默认密码：password。
 * 后台前端基于react开发，要在前端开发工具中启动才能访问。请另外下载jspbb-cp项目。
+* jspbb-cp项目github地址：[https://github.com/ujcms/jspbb-cp](https://github.com/ujcms/jspbb-cp)
+* jspbb-cp项目gitee地址：[https://gitee.com/jspxcms/jspbb-cp](https://gitee.com/jspxcms/jspbb-cp)
 
 ## GPL-2 简介
 

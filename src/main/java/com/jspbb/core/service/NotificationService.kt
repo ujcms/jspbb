@@ -47,6 +47,10 @@ class NotificationService(
     fun delete(id: Long): Long {
         return mapper.delete(id)
     }
+    @Transactional
+    fun deleteByUserId(userId: Long): Long {
+        return mapper.deleteByUserId(userId)
+    }
 
     @Transactional
     fun send(username: String, userId: Long, type: String, data: String, body: String, url: String): Notification {
@@ -58,6 +62,9 @@ class NotificationService(
 
     @Transactional
     fun deleteByTypeAndData(userId: Long, type: String, data: String): Long = mapper.deleteByTypeAndData(userId, type, data)
+
+    @Transactional
+    fun deleteByTypesAndData(userId: Long, types: Array<String>, data: String): Long = mapper.deleteByTypesAndData(userId, types, data)
 
     fun countByUserId(userId: Long): Long = mapper.countByUserId(userId)
 

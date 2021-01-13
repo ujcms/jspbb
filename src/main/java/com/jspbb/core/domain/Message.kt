@@ -54,7 +54,7 @@ open class Message(
         const val TYPE_INBOX = 1
         /** 类型：发件箱 */
         const val TYPE_OUTBOX = 2
-        /** 通知类型 */
+        /** URL地址 */
         const val MESSAGES_CONTACT_URL = "/messages/contact/{contactUserId}"
 
         fun getMessageContactUrl(contactUserId: Long): String = UriTemplate(MESSAGES_CONTACT_URL).expand(contactUserId).toString()

@@ -106,6 +106,7 @@
                                 <div class="markdown-body" th:utext="${comment.html}">评论内容</div>
                                 <div class="text-muted">
                                     <span th:text="${#jspbb.prettyTime(comment.created)}"></span> by <a href="javascript:" th:text="${comment.user.username}"></a>
+                                    <a class="text-muted ml-1" th:data-id="${comment.id}" th:data-markdown="${comment.markdown}" onclick="editComment(this)" href="javascript:" th:if="${user?.hasPerm('commentEdit',comment.userId)}" th:text="#{edit}">编辑</a>
                                     <a class="text-muted ml-1" th:data-id="${comment.id}" onclick="deleteComment(this)" href="javascript:" th:if="${user?.hasPerm('commentDelete',comment.userId)}" th:text="#{delete}">删除</a>
                                 </div>
                             </li>

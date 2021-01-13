@@ -73,34 +73,42 @@ public class SensitiveFilter {
         if (StringUtils.isBlank(text)) return Collections.emptyList();
         List<Hit> hits = new ArrayList<>();
         for (int i = 0, len = text.length(); i < len; i += 1) {
-            int sensitiveLength = find(text, i, maxMatch);
-            if (sensitiveLength > 0) {
-                hits.add(new Hit(i, i + sensitiveLength, text.substring(i, i + sensitiveLength)));
+            Hit hit = find(text, i, maxMatch);
+            if (hit != null) {
+                hits.add(hit);
                 if (!maxMatch) break;
                 // 循环本身会自动 +1 ，所以要 -1
-                i += sensitiveLength - 1;
+                i += hit.getLength() - 1;
             }
         }
         return hits;
     }
 
-    private int find(String text, int begin, boolean maxMatch) {
+    private Hit find(String text, int begin, boolean maxMatch) {
         Map<Character, TrieNode> currMap = sensitiveWordMap;
         // 正在查找的敏感词长度
         int length = 0;
         // 找到的敏感词长度
         int foundLength = 0;
+        // 匹配到敏感词库中哪个敏感词，正在查找中的敏感词
+        StringBuilder word = new StringBuilder();
+        // 匹配到敏感词库中哪个敏感词，已找到的
+        String foundWord = null;
         for (int i = begin, len = text.length(); i < len; i += 1) {
-            TrieNode node = currMap.get(text.charAt(i));
+            char curr = text.charAt(i);
+            TrieNode node = currMap.get(curr);
             length += 1;
             if (node == null) break;
+            word.append(curr);
             if (node.isEnd()) {
                 foundLength = length;
+                foundWord = word.toString();
                 if (!maxMatch) break;
             }
             currMap = node.getValues();
         }
-        return foundLength;
+        if (foundLength > 0) return new Hit(begin, begin + foundLength, text.substring(begin, begin + foundLength), foundWord);
+        return null;
     }
 
     public Map<Character, TrieNode> getSensitiveWordMap() {

@@ -44,6 +44,7 @@
         <!--<script src="../../../vendor/immutable/dist/immutable.min.js" th:src="@{/vendor/immutable/dist/immutable.min.js}"></script>-->
         <script src="../../../vendor/lodash/lodash.min.js" th:src="@{/vendor/lodash/lodash.min.js}"></script>
         <!--<script src="../../vendor/circular-json/build/circular-json.js" th:src="@{/vendor/circular-json/build/circular-json.js}"></script>-->
+        <script src="../../../vendor/vue/dist/vue.min.js" th:src="@{/vendor/vue/dist/vue.min.js}"></script>
         <script src="../js/main.js" th:src="|@{/templates}/${theme}/js/main.js|"></script>
     </th:block>
     <th:block th:fragment="js_simplemde">
@@ -80,11 +81,20 @@
                     </div>
                 </div>
             </form>
-            <div th:if="${user}" class="mr-3 mr-lg-4">
-                <a th:href="@{/notifications}"><i class="far fa-bell lead"></i><span class="badge badge-danger" id="notificationCount"></span></a>
+            <div th:if="${user}" class="dropdown mr-3 mr-lg-4">
+                <a th:href="@{/notifications}" class="dropdown-toggle" data-toggle="dropdown"><i class="far fa-bell lead"></i><span class="badge badge-danger" id="notificationCount"></span></a>
+                <div id="app-notifications" class="dropdown-menu dropdown-menu-right">
+                    <div class="small">
+                        <a class="dropdown-item" v-if="list.length>0" v-for="bean in list" :href="bean.url">{{bean.body}}</a>
+                    </div>
+                    <div class="dropdown-divider" v-if="list.length>0"></div>
+                    <a class="dropdown-item" th:href="@{/notifications}" v-if="list.length>0" th:text="#{notifications.all}"></a>
+                    <a class="dropdown-item" th:href="@{/notifications}" v-if="list.length==0" th:text="#{notifications.empty}"></a>
+                </div>
             </div>
             <div th:if="${user}" class="dropdown mr-3 mr-lg-4">
-                <img src="" th:src="@{${user.ext.pictureUrlSmall}}" th:alt="${user.username}" th:title="${user.username}" class="rounded-circle dropdown-toggle" data-toggle="dropdown" style="width:35px;height:35px;cursor:pointer;">
+                <img src="" th:src="@{${user.ext.pictureUrlSmall}}" th:alt="${user.username}" th:title="${user.username}" class="rounded-circle dropdown-toggle" data-toggle="dropdown" alt="用户头像"
+                     style="width:35px;height:35px;cursor:pointer;">
                 <div class="dropdown-menu dropdown-menu-right">
                     <a class="dropdown-item" th:href="@{${user.homepage}}"><i class="far fa-user"></i> <span th:text="#{myHome}"></span></a>
                     <a class="dropdown-item" th:href="@{/messages}">
@@ -117,41 +127,50 @@
             </form>
         </div>
     </nav>
-    <script th:inline="javascript">
+    <script th:inline="javascript" th:if="${user}">
+        const noticeVue = new Vue({
+            el: '#app-notifications',
+            data: {list: []}
+        });
         // 标题显示通知数量
         var origDocumentTitle = document.title;
         // 获取未读消息数量
         $messageUnreadCount = $('#messageUnreadCount');
-        request(/*[[@{/api/messages/unread_count}]]*/'').then(function(data){
-            if(data===null) return;
-            if (data > 0) $messageUnreadCount.text(result);
+        request(/*[[@{/api/messages/unread_count}]]*/'').then(function (data) {
+            if (data === null) return;
+            if (data > 0) $messageUnreadCount.text(data);
         });
         // 获取未读通知数量
         $notificationCount = $('#notificationCount');
-        request(/*[[@{/api/notifications/count}]]*/'').then(function(data){
-            if(data===null) return;
+        request(/*[[@{/api/notifications/count}]]*/'').then(function (data) {
+            if (data === null) return;
             if (data > 0) {
                 $notificationCount.text(data);
                 document.title = '(' + data + ') ' + origDocumentTitle;
             }
         });
+        request(/*[[@{/api/notifications}]]*/'').then(function (data) {
+            if (data === null) return;
+            if (data.length > 0) noticeVue.list = data;
+        });
         // 订阅通知
-        var socket = new SockJS(/*[[@{/portfolio}]]*/'');
-        var stompClient = Stomp.over(socket);
+        const socket = new SockJS(/*[[@{/portfolio}]]*/'');
+        const stompClient = Stomp.over(socket);
         stompClient.connect({}, function connectCallback(frame) {
             stompClient.subscribe('/user/queue/notifications', function (response) {
-                var obj = JSON.parse(response.body);
-                var notificationCount = $notificationCount.text();
+                const obj = JSON.parse(response.body);
+                const notificationCount = $notificationCount.text();
                 if (notificationCount === '') {
                     $notificationCount.text('1');
                     document.title = '(' + 1 + ') ' + origDocumentTitle;
                 } else {
-                    var notificationCountInt = parseInt(notificationCount) + 1;
+                    const notificationCountInt = parseInt(notificationCount) + 1;
                     $notificationCount.text(notificationCountInt);
                     document.title = '(' + notificationCountInt + ') ' + origDocumentTitle;
                 }
+                noticeVue.list.push(obj);
                 if (obj.type === 'message') {
-                    var messageUnreadCount = $messageUnreadCount.text();
+                    const messageUnreadCount = $messageUnreadCount.text();
                     if (messageUnreadCount === '') {
                         $messageUnreadCount.text('1');
                     } else {
@@ -159,12 +178,21 @@
                     }
                 }
                 if (isNotificationAllowed()) {
-                    var titles = {'message': /*[[#{notification.type.message}]]*/'', 'comment': /*[[#{notification.type.comment}]]*/'', 'reply': /*[[#{notification.type.reply}]]*/'', 'at': /*[[#{notification.type.at}]]*/''};
-                    var notification = new Notification(titles[obj.type], {body: obj.body, tag: obj.tag});
+                    const titles = {
+                        'question': /*[[#{notification.type.question}]]*/'',
+                        'questionEdit': /*[[#{notification.type.questionEdit}]]*/'',
+                        'answer': /*[[#{notification.type.answer}]]*/'',
+                        'answerEdit': /*[[#{notification.type.answerEdit}]]*/'',
+                        'comment': /*[[#{notification.type.comment}]]*/'',
+                        'message': /*[[#{notification.type.message}]]*/'',
+                        'at': /*[[#{notification.type.at}]]*/''
+                    };
+                    console.log(obj.type);
+                    const notification = new Notification(titles[obj.type], {body: obj.body, tag: obj.tag});
                     if (obj.url) {
                         notification.onclick = function (event) {
                             // event.preventDefault(); // prevent the browser from focusing the Notification's tab
-                            var contextPath = /*[[${#request.getContextPath()}]]*/'';
+                            const contextPath = /*[[${#request.getContextPath()}]]*/'';
                             location.href = contextPath + obj.url;
                         };
                     }
@@ -175,7 +203,8 @@
 </header>
 
 <footer th:fragment="footer" class="bg-light text-muted small text-center p-4 mt-3">
-    <div>Powered by <a href="http://www.jspxcms.com/jspbb/">jspBB</a> © <span th:text="${#temporals.year(#temporals.createToday())}"></span> jspBB <a href="http://beian.miit.gov.cn" rel="nofollow" class="text-muted text-nowrap">赣ICP备12001124号-1</a></div>
+    <div>Powered by <a href="http://www.jspxcms.com/jspbb/">jspBB</a> © <span th:text="${#temporals.year(#temporals.createToday())}"></span> jspBB <a href="http://beian.miit.gov.cn" rel="nofollow" class="text-muted text-nowrap">赣ICP备12001124号-1</a>
+    </div>
     <div class="mt-1" th:text="${#jspbb.processedIn()}"></div>
     <script>
         // (function () {

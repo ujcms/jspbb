@@ -43,7 +43,7 @@ class ConfigController(
     fun templateDirs(request: HttpServletRequest): Array<String> {
         val path = applicationContext.getResource(thymeleafProperties.prefix)
         // error 目录（显示错误信息的模板模板）不显示
-        return if (path.isFile) path.file.list { _, name -> name != "error" }?: emptyArray() else emptyArray()
+        return if (path.isFile) path.file.list { _, name -> name != "error" } ?: emptyArray() else emptyArray()
     }
 
     @GetMapping("/sign-up")
@@ -136,7 +136,7 @@ class ConfigController(
     @PutMapping("/sensitive-words")
     @RequiresPermissions("config:sensitive_words:update")
     fun updateSensitiveWord(@RequestBody words: String, request: HttpServletRequest): Any? {
-        sensitiveService.setSensitiveWords(StringUtils.split(words,"\r\n").toSet())
+        sensitiveService.setSensitiveWords(StringUtils.split(words, "\r\n").toSet())
         sensitiveService.writeSensitiveWordList(words)
         return Responses.ok()
     }

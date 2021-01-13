@@ -79,6 +79,12 @@
         FROM jspbb_user
         WHERE email_ = #{email}
     </select>
+    <select id="selectByGroupId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM jspbb_user
+        WHERE group_id_ = #{groupId}
+    </select>
     <select id="selectByHome" resultMap="BaseResultMap">
         SELECT
         <include refid="Base_Column_List"/>

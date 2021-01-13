@@ -14,6 +14,8 @@ open class AnswerExt(
         var markdown: String = "",
         /** 正文html */
         var text: String = "",
+        /** 匹配到的敏感词 */
+        var sensitiveWords: String? = null,
         /** IP */
         var ip: String = IP_NONE,
         /** IP国家 */

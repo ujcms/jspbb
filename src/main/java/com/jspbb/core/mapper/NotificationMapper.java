@@ -24,6 +24,10 @@ public interface NotificationMapper {
 
     long deleteByTypeAndData(@Nullable @Param("userId") Long userId, @Nullable @Param("type") String type, @Nullable @Param("data") String data);
 
+    long deleteByTypesAndData(@Nullable @Param("userId") Long userId, @Nullable @Param("types") String[] types, @Nullable @Param("data") String data);
+
+    long deleteByUserId(@NotNull Long userId);
+
     long countByUserId(@NotNull @Param("userId") Long userId);
 
     @NotNull

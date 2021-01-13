@@ -29,6 +29,8 @@ open class Comment(
         var markdown: String = "",
         /** 正文html */
         var text: String = "",
+        /** 匹配到的敏感词 */
+        var sensitiveWords: String? = null,
         /** 状态 */
         var status: Int = STATUS_NORMAL,
         /** IP */
@@ -61,6 +63,12 @@ open class Comment(
 
         /** 附件类型名 */
         const val ATTACH_TYPE = "comment"
+
+        /** 通知类型：新的评论 */
+        const val NOTIFICATION_TYPE = "comment"
+
+        /** 通知类型：评论更新 */
+        const val NOTIFICATION_UPDATE_TYPE = "commentUpdate"
 
         /** 状态：正常 */
         const val STATUS_NORMAL = 0

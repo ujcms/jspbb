@@ -18,7 +18,7 @@ open class Notification(
         var created: OffsetDateTime = OffsetDateTime.now(),
         /** 内容 */
         var body: String = "",
-        /** 内容 */
+        /** URL */
         var url: String? = null,
         /** 接收者 */
         @JsonIgnore open var user: User = User()
